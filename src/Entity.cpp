@@ -53,13 +53,15 @@ void Entity::update()
     
     init();//initialises object added at runtime
     for(int i = 0; i< m_components.size(); i++)
-        m_components[i]->update();
+        if(m_components[i]->m_enabled)
+            m_components[i]->update();
 }
 
 void Entity::render()
 {
     for(int i = 0; i< m_components.size(); i++)
-        m_components[i]->render();
+        if(m_components[i]->m_enabled)
+            m_components[i]->render();
 }
 
 Component * Entity::addComponent(Component * _c)

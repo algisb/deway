@@ -9,7 +9,7 @@
 #include "kep/collisionDetection/finephase/HalfPlaneCollider.h"
 #include "kep/collisionDetection/finephase/OBBCollider.h"
 #include "kep/collisionDetection/finephase/MeshCollider.h"
-
+#include "deway/TriBoxTest.h"
 using namespace kelp;
 
 World_0::World_0(Core * _core) : World(_core)
@@ -44,30 +44,60 @@ World_0::World_0(Core * _core) : World(_core)
     refEntity->addComponent(new KePhys(
         m_physWorld->addRigidBody(new kep::RigidBody(&refTransform->m_position, &refTransform->m_orientation, true, 0.0f, mc))//new kep::HalfPlaneCollider()
     ));
+    
+    
+    /////////////////////TRI BOX TEST///////////////////////////////
+    //TEST VOLUME
+    std::vector<Entity*> voxelT;
     for(int k = 0; k<10; k++)
         for(int j = 0; j<10; j++)
             for(int i =0; i<10; i++)
             {
                 refEntity = new Entity(this, "box");
                 refTransform = (Transform*)refEntity->addComponent(new Transform(
-                                                    kep::Vector3((float)i*2, (float)k*2 + 5.0f, (float)j*2),
+                                                    kep::Vector3((float)i*2 -10.0f, (float)k*2 + 5.0f, (float)j*2 -5.0f),
                                                     kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
                                                     kep::Vector3(1.0f, 1.0f, 1.0f)
                                                     ));
-                refEntity->addComponent(new Render(m_core->m_cubeMesh, m_core->m_shaderMinimal, NULL, RenderMode::WIRE));
+                Render * tmpRender = new Render(m_core->m_cubeMesh, m_core->m_shaderMinimal, NULL, RenderMode::WIRE);
+                tmpRender->m_enabled = false;
+                refEntity->addComponent(tmpRender);
+                
+                voxelT.push_back(refEntity);
             }
-            
     
-    m_core->m_triangleMesh->addTri(kep::Vector3(3.0f, 5.0f, 6.0f), kep::Vector3(0.0f, 9.0f, -5.0f), kep::Vector3(-6.0f, 4.0f, 8.0f));
+    //TEST TRIANGLE
+    kep::Vector3 v[3] = {kep::Vector3(3.0f, 5.0f, 6.0f), kep::Vector3(0.0f, 9.0f, -5.0f), kep::Vector3(-6.0f, 4.0f, 8.0f)};
+    m_core->m_triangleMesh->addTri(v[0],v[1],v[2]);
     m_core->m_triangleMesh->gen();
     
     refEntity = new Entity(this, "trinagle");
     refTransform = (Transform*)refEntity->addComponent(new Transform(
-                                        kep::Vector3(0.0f, 5.0f, 0.0f),
+                                        kep::Vector3(0.0f, 0.0f, 0.0f),
                                         kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
                                         kep::Vector3(1.0f, 1.0f, 1.0f)
                                         ));
     refEntity->addComponent(new Render(m_core->m_triangleMesh, m_core->m_shaderDefault, NULL, RenderMode::SOLID));
+    
+    //TEST VOXELIZATION
+    for(int i = 0; i<voxelT.size(); i++)
+    {
+        Transform * t = voxelT[i]->getComponent<Transform>();
+        Render * r = voxelT[i]->getComponent<Render>();
+        
+        float boxcenter[3] = {t->m_position.x, t->m_position.y, t->m_position.z};
+        float halfsize[3] = {1.0f, 1.0f, 1.0f};
+        
+        float trivert[3][3];
+        for(int j = 0; j<3; j++)
+            for(int k = 0; k<3; k++)
+                trivert[j][k] = v[j].data[k];
+        
+        if(deway::triBoxOverlap(boxcenter, halfsize, trivert) == 1)
+        {
+            r->m_enabled = true;
+        }
+    }
     
     ///////////////////////////////////////////////////////////////////////////////////////////////
     
