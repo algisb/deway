@@ -17,7 +17,7 @@ World_0::World_0(Core * _core) : World(_core)
     Entity * refEntity = NULL;
     Transform * refTransform = NULL;
     kep::MeshCollider * mc = NULL;
-
+    
     //LIGHTS//////////////////////////////////////////////////////////////////////////////////////
     refEntity = new Entity(this, "Directional Light");
     refEntity->addComponent(new LightDirectional(m_core->m_shaderDefault, 0.5f, kep::Vector3(0.0f,0.0f,0.0f), kep::Vector3(0.0f, 1.0f, 1.0f)));
@@ -44,7 +44,30 @@ World_0::World_0(Core * _core) : World(_core)
     refEntity->addComponent(new KePhys(
         m_physWorld->addRigidBody(new kep::RigidBody(&refTransform->m_position, &refTransform->m_orientation, true, 0.0f, mc))//new kep::HalfPlaneCollider()
     ));
+    for(int k = 0; k<10; k++)
+        for(int j = 0; j<10; j++)
+            for(int i =0; i<10; i++)
+            {
+                refEntity = new Entity(this, "box");
+                refTransform = (Transform*)refEntity->addComponent(new Transform(
+                                                    kep::Vector3((float)i*2, (float)k*2 + 5.0f, (float)j*2),
+                                                    kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
+                                                    kep::Vector3(1.0f, 1.0f, 1.0f)
+                                                    ));
+                refEntity->addComponent(new Render(m_core->m_cubeMesh, m_core->m_shaderMinimal, NULL, RenderMode::WIRE));
+            }
+            
     
+    m_core->m_triangleMesh->addTri(kep::Vector3(3.0f, 5.0f, 6.0f), kep::Vector3(0.0f, 9.0f, -5.0f), kep::Vector3(-6.0f, 4.0f, 8.0f));
+    m_core->m_triangleMesh->gen();
+    
+    refEntity = new Entity(this, "trinagle");
+    refTransform = (Transform*)refEntity->addComponent(new Transform(
+                                        kep::Vector3(0.0f, 5.0f, 0.0f),
+                                        kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
+                                        kep::Vector3(1.0f, 1.0f, 1.0f)
+                                        ));
+    refEntity->addComponent(new Render(m_core->m_triangleMesh, m_core->m_shaderDefault, NULL, RenderMode::SOLID));
     
     ///////////////////////////////////////////////////////////////////////////////////////////////
     
