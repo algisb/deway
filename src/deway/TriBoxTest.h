@@ -1,5 +1,7 @@
 #ifndef TRIBOXTEST_H_
 #define TRIBOXTEST_H_
+#include "Triangle.h"
+#include "Box.h"
 namespace deway
 {
     /********************************************************/
@@ -67,8 +69,7 @@ namespace deway
 
 
 
-    int planeBoxOverlap(float normal[3], float vert[3], float maxbox[3])	// -NJMP-
-
+    inline int planeBoxOverlap(float normal[3], float vert[3], float maxbox[3])	// -NJMP-
     {
 
     int q;
@@ -179,8 +180,7 @@ namespace deway
 
 
 
-    int triBoxOverlap(float boxcenter[3],float boxhalfsize[3],float triverts[3][3])
-
+    inline int triBoxOverlap(float boxcenter[3],float boxhalfsize[3],float triverts[3][3])
     {
 
 
@@ -330,6 +330,9 @@ namespace deway
     return 1;   /* box and triangle overlaps */
 
     }
+    
+    int triBoxTest(Triangle _t, Box _b);
+    
 }
 
 #endif //TRIBOXTEST_H_

@@ -93,10 +93,17 @@ World_0::World_0(Core * _core) : World(_core)
             for(int k = 0; k<3; k++)
                 trivert[j][k] = v[j].data[k];
         
-        if(deway::triBoxOverlap(boxcenter, halfsize, trivert) == 1)
+        deway::Triangle tri(v[0], v[1], v[2]);
+        deway::Box box(kep::Vector3(t->m_position.x, t->m_position.y, t->m_position.z), kep::Vector3(1.0f, 1.0f, 1.0f));    
+            
+        if(deway::triBoxTest(tri, box) == 1)//deway::triBoxOverlap(boxcenter, halfsize, trivert) == 1)
         {
             r->m_enabled = true;
         }
+
+        
+        //printf("is overlaping : %d \n", deway::triBoxTest(tri, box));
+        
     }
     
     ///////////////////////////////////////////////////////////////////////////////////////////////
