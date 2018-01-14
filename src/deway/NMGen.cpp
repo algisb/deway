@@ -38,7 +38,7 @@ void NMGen::voxelize()
         for(int y = 0; y<m_volY; y++)
             for(int z = 0; z<m_volZ; z++)
             {
-                m_voxelVolume[iter] = Box(kep::Vector3((float)x * m_voxelSize * 2, (float)y * m_voxelSize * 2, (float)z * m_voxelSize * 2), kep::Vector3(m_voxelSize, m_voxelSize, m_voxelSize));
+                m_voxelVolume[iter] = Box(kep::Vector3(((float)x * m_voxelSize * 2) - ((m_voxelSize * 2 *m_volX)/2) + m_voxelSize, ((float)y * m_voxelSize * 2) - ((m_voxelSize * 2 *m_volX)/2) + m_voxelSize, ((float)z * m_voxelSize * 2) - ((m_voxelSize * 2 *m_volX)/2) + m_voxelSize) , kep::Vector3(m_voxelSize, m_voxelSize, m_voxelSize));
                 iter++;
             }
 }

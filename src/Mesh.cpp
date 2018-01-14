@@ -27,6 +27,7 @@ Mesh::Mesh()
     m_vboN = 0;
     m_vboT = 0;
     m_numVertices = 0;
+    m_drawMode = GL_TRIANGLES;
     
 }
 
@@ -52,7 +53,7 @@ void Mesh::clear()
 
 MeshGen::MeshGen()
 {
-    
+    m_drawMode = GL_TRIANGLES;
 }
 MeshGen::~MeshGen()
 {
@@ -65,33 +66,134 @@ void MeshGen::addTri(kep::Vector3 _p0, kep::Vector3 _p1, kep::Vector3 _p2)
     m_verticies.push_back(_p1);
     m_verticies.push_back(_p2);
 }
+void MeshGen::addBox(kep::Vector3 _center, kep::Vector3 _halfSize)
+{
+    kep::Vector3 p[8];
+    p[0] = _center + kep::Vector3(_halfSize.x, _halfSize.y, _halfSize.z);
+    p[1] = _center + kep::Vector3(-_halfSize.x, _halfSize.y, _halfSize.z);
+    p[2] = _center + kep::Vector3(-_halfSize.x, _halfSize.y, -_halfSize.z);
+    p[3] = _center + kep::Vector3(_halfSize.x, _halfSize.y, -_halfSize.z);
 
+    p[4] = _center + kep::Vector3(_halfSize.x, -_halfSize.y, _halfSize.z);
+    p[5] = _center + kep::Vector3(-_halfSize.x, -_halfSize.y, _halfSize.z);
+    p[6] = _center + kep::Vector3(-_halfSize.x, -_halfSize.y, -_halfSize.z);
+    p[7] = _center + kep::Vector3(_halfSize.x, -_halfSize.y, -_halfSize.z);
+    
+    addTri(p[0], p[1], p[3]);
+    addTri(p[2], p[1], p[3]);
+
+    addTri(p[4], p[5], p[7]);
+    addTri(p[6], p[5], p[7]);    
+    
+    addTri(p[0], p[1], p[4]);
+    addTri(p[5], p[1], p[4]);
+    
+    addTri(p[1], p[2], p[5]);
+    addTri(p[6], p[2], p[5]);
+    
+    addTri(p[2], p[3], p[6]);
+    addTri(p[7], p[3], p[6]);
+    
+    addTri(p[3], p[0], p[7]);
+    addTri(p[4], p[0], p[7]);
+    
+}
 void MeshGen::gen()
 {
     ///////////////////////////////////
     clear();
     ///////////////////////////////////
     
-    
-    glGenVertexArrays(1, &m_vao);
-    glBindVertexArray(m_vao);
+    if(m_verticies.size()>0)
+    {
+        glGenVertexArrays(1, &m_vao);
+        glBindVertexArray(m_vao);
 
-    m_numVertices = m_verticies.size();
-    glGenBuffers(1, &m_vboV);
-    glBindBuffer(GL_ARRAY_BUFFER, m_vboV);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(kep::Vector3) * m_verticies.size(), &m_verticies[0], GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(0);
+        m_numVertices = m_verticies.size();
+        glGenBuffers(1, &m_vboV);
+        glBindBuffer(GL_ARRAY_BUFFER, m_vboV);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(kep::Vector3) * m_verticies.size(), &m_verticies[0], GL_STATIC_DRAW);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+    }
 }
+
+MeshGenLine::MeshGenLine()
+{
+    m_drawMode = GL_LINES;
+}
+MeshGenLine::~MeshGenLine()
+{
+    clear();
+}
+
+void MeshGenLine::addLine(kep::Vector3 _p0, kep::Vector3 _p1)
+{
+    m_verticies.push_back(_p0);
+    m_verticies.push_back(_p1);
+}
+void MeshGenLine::addBox(kep::Vector3 _center, kep::Vector3 _halfSize)
+{
+    kep::Vector3 p[8];
+    p[0] = _center + kep::Vector3(_halfSize.x, _halfSize.y, _halfSize.z);
+    p[1] = _center + kep::Vector3(-_halfSize.x, _halfSize.y, _halfSize.z);
+    p[2] = _center + kep::Vector3(-_halfSize.x, _halfSize.y, -_halfSize.z);
+    p[3] = _center + kep::Vector3(_halfSize.x, _halfSize.y, -_halfSize.z);
+
+    p[4] = _center + kep::Vector3(_halfSize.x, -_halfSize.y, _halfSize.z);
+    p[5] = _center + kep::Vector3(-_halfSize.x, -_halfSize.y, _halfSize.z);
+    p[6] = _center + kep::Vector3(-_halfSize.x, -_halfSize.y, -_halfSize.z);
+    p[7] = _center + kep::Vector3(_halfSize.x, -_halfSize.y, -_halfSize.z);
+    
+    addLine(p[0], p[1]);
+    addLine(p[1], p[2]);
+    addLine(p[2], p[3]);
+    addLine(p[3], p[0]);
+    
+    addLine(p[4], p[5]);
+    addLine(p[5], p[6]);
+    addLine(p[6], p[7]);
+    addLine(p[7], p[4]);
+    
+    addLine(p[0], p[4]);
+    addLine(p[1], p[5]);
+    addLine(p[2], p[6]);
+    addLine(p[3], p[7]);
+}
+
+void MeshGenLine::gen()
+{
+    ///////////////////////////////////
+    clear();
+    ///////////////////////////////////
+    if(m_verticies.size()>0)
+    {
+        glGenVertexArrays(1, &m_vao);
+        glBindVertexArray(m_vao);
+
+        m_numVertices = m_verticies.size();
+        glGenBuffers(1, &m_vboV);
+        glBindBuffer(GL_ARRAY_BUFFER, m_vboV);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(kep::Vector3) * m_verticies.size(), &m_verticies[0], GL_STATIC_DRAW);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+    }
+}
+
+
 
 
                 
 
 MeshLoad::MeshLoad(const char * _objPath, const char * _mtlDir)
 {
+    m_drawMode = GL_TRIANGLES;
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> materials;

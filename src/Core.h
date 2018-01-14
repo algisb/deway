@@ -45,6 +45,7 @@ namespace kelp
         MeshLoad * m_monkeyMesh;
         MeshLoad * m_sandBox;
         MeshGen * m_triangleMesh;
+        MeshGenLine * m_voxelVolumeMesh;
         
         MeshLoad * m_externalMesh;
         MeshLoad * m_dungeon;

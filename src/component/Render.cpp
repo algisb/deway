@@ -78,7 +78,7 @@ void Render::render()
     }
         //glDisable(GL_DEPTH_TEST);
     glBindVertexArray( m_mesh->m_vao );
-    glDrawArrays(GL_TRIANGLES, 0, m_mesh->m_numVertices);
+    glDrawArrays(m_mesh->m_drawMode, 0, m_mesh->m_numVertices);
     glBindVertexArray( 0 );
     if(m_disableDepth)
     {

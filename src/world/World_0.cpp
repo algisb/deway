@@ -25,7 +25,7 @@ World_0::World_0(Core * _core) : World(_core)
     
     plight = new Entity(this, "Point Light");
     plight->addComponent(new Transform(
-                                        kep::Vector3(-4.0f, 10.0f, 10.0f),
+                                        kep::Vector3(0.0f, 10.0f, 0.0f),
                                         kep::Quaternion(), 
                                         kep::Vector3(0.2f, 0.2f, 0.2f)
                                         ));
@@ -54,23 +54,26 @@ World_0::World_0(Core * _core) : World(_core)
     
     //GENERATOR
     deway::NMGen nmgen(m_core->m_triangleMesh->m_dataV, m_core->m_triangleMesh->m_dataN, m_core->m_triangleMesh->m_numVertices,
-        20, 20, 20, 1.0f);
+        10, 10, 10, 1.0f);
+    
+
     
     
     //TEST VOLUME VISUALIZATION
     for(int i = 0; i<nmgen.m_numVoxel; i++)
     {
-        refEntity = new Entity(this, "box");
-        refTransform = (Transform*)refEntity->addComponent(new Transform(
-                                            nmgen.m_voxelVolume[i].c,
-                                            kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
-                                            nmgen.m_voxelVolume[i].hs
-                                            ));
-        Render * tmpRender = new Render(m_core->m_cubeMesh, m_core->m_shaderMinimal, NULL, RenderMode::WIRE);
-        refEntity->addComponent(tmpRender);
+        m_core->m_voxelVolumeMesh->addBox(nmgen.m_voxelVolume[i].c, nmgen.m_voxelVolume[i].hs);
     }
+    m_core->m_voxelVolumeMesh->gen();
     
-
+    refEntity = new Entity(this, "voxel volume");
+    refTransform = (Transform*)refEntity->addComponent(new Transform(
+                                        kep::Vector3(0.0f, 0.0f, 0.0f),
+                                        kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
+                                        kep::Vector3(1.0f, 1.0f, 1.0f)
+                                        ));
+    Render * tmpRender = new Render(m_core->m_voxelVolumeMesh, m_core->m_shaderMinimal, NULL, RenderMode::WIRE);
+    refEntity->addComponent(tmpRender);
     
     ///////////////////////////////////////////////////////////////////////////////////////////////
     

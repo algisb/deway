@@ -17,6 +17,7 @@ namespace kelp
         GLuint m_vboN;//normal data
         GLuint m_vboT;//Texture data
         
+        GLuint m_drawMode;//GL_TRIANGLES ,GL_LINES
         unsigned int m_numVertices;
         float * m_dataV;
         float * m_dataN;
@@ -34,6 +35,17 @@ namespace kelp
         MeshGen();
         ~MeshGen();
         void addTri(kep::Vector3 _p0, kep::Vector3 _p1, kep::Vector3 _p2);
+        void addBox(kep::Vector3 _center, kep::Vector3 _halfSize);
+        void gen();
+    };
+    class MeshGenLine : public Mesh
+    {
+    public:
+        std::vector<kep::Vector3> m_verticies;
+        MeshGenLine();
+        ~MeshGenLine();
+        void addLine(kep::Vector3 _p0, kep::Vector3 _p1);
+        void addBox(kep::Vector3 _center, kep::Vector3 _halfSize);
         void gen();
     };
     
