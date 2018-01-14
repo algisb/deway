@@ -10,6 +10,7 @@
 #include "kep/collisionDetection/finephase/OBBCollider.h"
 #include "kep/collisionDetection/finephase/MeshCollider.h"
 #include "deway/TriBoxTest.h"
+#include "deway/NMGen.h"
 using namespace kelp;
 
 World_0::World_0(Core * _core) : World(_core)
@@ -45,66 +46,31 @@ World_0::World_0(Core * _core) : World(_core)
         m_physWorld->addRigidBody(new kep::RigidBody(&refTransform->m_position, &refTransform->m_orientation, true, 0.0f, mc))//new kep::HalfPlaneCollider()
     ));
     
-    
-    /////////////////////TRI BOX TEST///////////////////////////////
-    //TEST VOLUME
-    std::vector<Entity*> voxelT;
-    for(int k = 0; k<10; k++)
-        for(int j = 0; j<10; j++)
-            for(int i =0; i<10; i++)
-            {
-                refEntity = new Entity(this, "box");
-                refTransform = (Transform*)refEntity->addComponent(new Transform(
-                                                    kep::Vector3((float)i*2 -10.0f, (float)k*2 + 5.0f, (float)j*2 -5.0f),
-                                                    kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
-                                                    kep::Vector3(1.0f, 1.0f, 1.0f)
-                                                    ));
-                Render * tmpRender = new Render(m_core->m_cubeMesh, m_core->m_shaderMinimal, NULL, RenderMode::WIRE);
-                tmpRender->m_enabled = false;
-                refEntity->addComponent(tmpRender);
-                
-                voxelT.push_back(refEntity);
-            }
-    
     //TEST TRIANGLE
     kep::Vector3 v[3] = {kep::Vector3(3.0f, 5.0f, 6.0f), kep::Vector3(0.0f, 9.0f, -5.0f), kep::Vector3(-6.0f, 4.0f, 8.0f)};
     m_core->m_triangleMesh->addTri(v[0],v[1],v[2]);
     m_core->m_triangleMesh->gen();
     
-    refEntity = new Entity(this, "trinagle");
-    refTransform = (Transform*)refEntity->addComponent(new Transform(
-                                        kep::Vector3(0.0f, 0.0f, 0.0f),
-                                        kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
-                                        kep::Vector3(1.0f, 1.0f, 1.0f)
-                                        ));
-    refEntity->addComponent(new Render(m_core->m_triangleMesh, m_core->m_shaderDefault, NULL, RenderMode::SOLID));
     
-    //TEST VOXELIZATION
-    for(int i = 0; i<voxelT.size(); i++)
+    //GENERATOR
+    deway::NMGen nmgen(m_core->m_triangleMesh->m_dataV, m_core->m_triangleMesh->m_dataN, m_core->m_triangleMesh->m_numVertices,
+        20, 20, 20, 1.0f);
+    
+    
+    //TEST VOLUME VISUALIZATION
+    for(int i = 0; i<nmgen.m_numVoxel; i++)
     {
-        Transform * t = voxelT[i]->getComponent<Transform>();
-        Render * r = voxelT[i]->getComponent<Render>();
-        
-        float boxcenter[3] = {t->m_position.x, t->m_position.y, t->m_position.z};
-        float halfsize[3] = {1.0f, 1.0f, 1.0f};
-        
-        float trivert[3][3];
-        for(int j = 0; j<3; j++)
-            for(int k = 0; k<3; k++)
-                trivert[j][k] = v[j].data[k];
-        
-        deway::Triangle tri(v[0], v[1], v[2]);
-        deway::Box box(kep::Vector3(t->m_position.x, t->m_position.y, t->m_position.z), kep::Vector3(1.0f, 1.0f, 1.0f));    
-            
-        if(deway::triBoxTest(tri, box) == 1)//deway::triBoxOverlap(boxcenter, halfsize, trivert) == 1)
-        {
-            r->m_enabled = true;
-        }
-
-        
-        //printf("is overlaping : %d \n", deway::triBoxTest(tri, box));
-        
+        refEntity = new Entity(this, "box");
+        refTransform = (Transform*)refEntity->addComponent(new Transform(
+                                            nmgen.m_voxelVolume[i].c,
+                                            kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
+                                            nmgen.m_voxelVolume[i].hs
+                                            ));
+        Render * tmpRender = new Render(m_core->m_cubeMesh, m_core->m_shaderMinimal, NULL, RenderMode::WIRE);
+        refEntity->addComponent(tmpRender);
     }
+    
+
     
     ///////////////////////////////////////////////////////////////////////////////////////////////
     

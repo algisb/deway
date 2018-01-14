@@ -8,7 +8,7 @@ namespace deway
     public:
         kep::Vector3 c;//center
         kep::Vector3 hs;//halfsize
-        Box(kep::Vector3 _center, kep::Vector3 _halfSize);
+        Box(kep::Vector3 _center = kep::Vector3(0.0f, 0.0f, 0.0f), kep::Vector3 _halfSize = kep::Vector3(0.0f, 0.0f, 0.0f));
         ~Box();
         
     };
