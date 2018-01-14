@@ -51,19 +51,32 @@ World_0::World_0(Core * _core) : World(_core)
     m_core->m_triangleMesh->addTri(v[0],v[1],v[2]);
     m_core->m_triangleMesh->gen();
     
+    refEntity = new Entity(this, "test mesh");
+    refTransform = (Transform*)refEntity->addComponent(new Transform(
+                                        kep::Vector3(0.0f, 0.0f, 0.0f),
+                                        kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
+                                        kep::Vector3(1.0f, 1.0f, 1.0f)
+                                        ));
+    refEntity->addComponent(new Render(m_core->m_triangleMesh, m_core->m_shaderDefault, NULL, RenderMode::SOLID));
     
+    printf("%f \n", m_core->m_triangleMesh->m_dataV[0]);
     //GENERATOR
     deway::NMGen nmgen(m_core->m_triangleMesh->m_dataV, m_core->m_triangleMesh->m_dataN, m_core->m_triangleMesh->m_numVertices,
-        10, 10, 10, 1.0f);
+        30, 30, 30, 0.5f);
     
 
     
     
     //TEST VOLUME VISUALIZATION
-    for(int i = 0; i<nmgen.m_numVoxel; i++)
+    for(int i = 0; i<nmgen.m_numOverlapVoxel; i++)
     {
-        m_core->m_voxelVolumeMesh->addBox(nmgen.m_voxelVolume[i].c, nmgen.m_voxelVolume[i].hs);
+        m_core->m_voxelVolumeMesh->addBox(nmgen.m_overlapVoxels[i].c, nmgen.m_overlapVoxels[i].hs);
     }
+    
+//     for(int i = 0; i<nmgen.m_numVoxel; i++)
+//     {
+//         m_core->m_voxelVolumeMesh->addBox(nmgen.m_voxelVolume[i].c, nmgen.m_voxelVolume[i].hs);
+//     }
     m_core->m_voxelVolumeMesh->gen();
     
     refEntity = new Entity(this, "voxel volume");
@@ -72,8 +85,7 @@ World_0::World_0(Core * _core) : World(_core)
                                         kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
                                         kep::Vector3(1.0f, 1.0f, 1.0f)
                                         ));
-    Render * tmpRender = new Render(m_core->m_voxelVolumeMesh, m_core->m_shaderMinimal, NULL, RenderMode::WIRE);
-    refEntity->addComponent(tmpRender);
+    refEntity->addComponent(new Render(m_core->m_voxelVolumeMesh, m_core->m_shaderMinimal, NULL, RenderMode::WIRE));
     
     ///////////////////////////////////////////////////////////////////////////////////////////////
     
