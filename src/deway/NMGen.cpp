@@ -1,7 +1,7 @@
 #include "NMGen.h"
 using namespace deway;
 NMGen::NMGen(float * _vertexData, float * _normalData, uint _numVertex,
-    uint _volX, uint _volY, uint _volZ, float _voxelSize)
+    uint _volX, uint _volY, uint _volZ, float _voxelSize, kep::Vector3 _offset)
 {
     float * dataV = _vertexData;
     float * dataN = _normalData;
@@ -28,7 +28,8 @@ NMGen::NMGen(float * _vertexData, float * _normalData, uint _numVertex,
     m_voxelSize = _voxelSize;
     m_voxels = new Voxel[m_numVoxel];
     m_overlapVoxels = NULL;
-    m_numOverlapVoxel = 0;
+    m_numOverlapVoxels = 0;
+    m_offset = _offset;
     voxelize();
     
 }
@@ -47,15 +48,18 @@ void NMGen::voxelize()
         {
             if(triBoxTest(m_triangles[j], m_voxels[i]) == 1)
             {
-                m_voxels[i].overlaps = true;
-                m_numOverlapVoxel++;
+                if(m_voxels[i].overlaps == false)
+                {
+                    m_voxels[i].overlaps = true;
+                    m_numOverlapVoxels++;
+                }
             }
         }
     }
     
-    //get a list of referances to the overlaping voxels
+    //get a list of refs to the overlaping voxels
     uint iter = 0;
-    m_overlapVoxels = new Voxel*[m_numOverlapVoxel];
+    m_overlapVoxels = new Voxel*[m_numOverlapVoxels];
     for(uint i = 0; i<m_numVoxel; i++)
     {
         if(m_voxels[i].overlaps == true)
@@ -73,7 +77,10 @@ void NMGen::genVoxelVolume()
         for(int y = 0; y<m_volY; y++)
             for(int z = 0; z<m_volZ; z++)
             {
-                m_voxels[iter] = Voxel(kep::Vector3(((float)x * m_voxelSize * 2) - ((m_voxelSize * 2 *m_volX)/2) + m_voxelSize, ((float)y * m_voxelSize * 2) - ((m_voxelSize * 2 *m_volX)/2) + m_voxelSize, ((float)z * m_voxelSize * 2) - ((m_voxelSize * 2 *m_volX)/2) + m_voxelSize) , kep::Vector3(m_voxelSize, m_voxelSize, m_voxelSize));
+                m_voxels[iter] = Voxel(kep::Vector3(((float)x * m_voxelSize * 2) - ((m_voxelSize * 2 *m_volX)/2) + m_voxelSize + m_offset.x, 
+                                                    ((float)y * m_voxelSize * 2) - ((m_voxelSize * 2 *m_volY)/2) + m_voxelSize + m_offset.y, 
+                                                    ((float)z * m_voxelSize * 2) - ((m_voxelSize * 2 *m_volZ)/2) + m_voxelSize + m_offset.z),
+                                       kep::Vector3(m_voxelSize, m_voxelSize, m_voxelSize));
                 iter++;
             }
 }

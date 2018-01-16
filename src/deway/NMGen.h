@@ -20,9 +20,11 @@ namespace deway
         uint m_numVoxel;
         Voxel * m_voxels;
         
-        uint m_numOverlapVoxel;
+        uint m_numOverlapVoxels;
         Voxel ** m_overlapVoxels;//array of poiters holding referances
-        NMGen(float * _vertexData, float * _normalData, uint _numVertex, uint _volX, uint _volY, uint _volZ, float _voxelSize);
+        kep::Vector3 m_offset; //voxel volume offset from world origin
+        
+        NMGen(float * _vertexData, float * _normalData, uint _numVertex, uint _volX, uint _volY, uint _volZ, float _voxelSize, kep::Vector3 _offset);
         ~NMGen();
         void voxelize();
         void genVoxelVolume();

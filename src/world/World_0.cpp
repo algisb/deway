@@ -37,7 +37,7 @@ World_0::World_0(Core * _core) : World(_core)
     refTransform = (Transform*)refEntity->addComponent(new Transform(
                                         kep::Vector3(0.0f, 0.0f, 0.0f),
                                         kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
-                                        kep::Vector3(10.0f, 10.0f, 10.0f)
+                                        kep::Vector3(1.0f, 1.0f, 1.0f)
                                         ));
     refEntity->addComponent(new Render(m_core->m_sandBox, m_core->m_shaderDefault, NULL, RenderMode::SOLID));
     
@@ -47,33 +47,46 @@ World_0::World_0(Core * _core) : World(_core)
     ));
     
     //TEST TRIANGLE
-    kep::Vector3 v[3] = {kep::Vector3(3.0f, 5.0f, 6.0f), kep::Vector3(0.0f, 9.0f, -5.0f), kep::Vector3(-6.0f, 4.0f, 8.0f)};
-    m_core->m_triangleMesh->addTri(v[0],v[1],v[2]);
+    m_core->m_triangleMesh->addTri(kep::Vector3(3.0f, 5.0f, 6.0f), kep::Vector3(0.0f, 9.0f, -5.0f), kep::Vector3(-6.0f, 4.0f, 8.0f));
+    m_core->m_triangleMesh->addTri(kep::Vector3(3.0f, 5.0f, 6.0f), kep::Vector3(0.0f, 9.0f, -5.0f), kep::Vector3(7.0f, 4.0f, -10.0f));
     m_core->m_triangleMesh->gen();
     
-    refEntity = new Entity(this, "test mesh");
+//     refEntity = new Entity(this, "test mesh");
+//     refTransform = (Transform*)refEntity->addComponent(new Transform(
+//                                         kep::Vector3(0.0f, 0.0f, 0.0f),
+//                                         kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
+//                                         kep::Vector3(1.0f, 1.0f, 1.0f)
+//                                         ));
+//     refEntity->addComponent(new Render(m_core->m_dungeon, m_core->m_shaderDefault, NULL, RenderMode::SOLID));
+    
+    //GENERATOR
+    Mesh * polySoup = m_core->m_sandBox;
+    deway::NMGen nmgen(polySoup->m_dataV, polySoup->m_dataN, polySoup->m_numVertices,
+        80, 10, 80, 0.3f, kep::Vector3(1.3f, 0.0f, 0.0f));
+    
+    
+    m_core->m_voxelVolumeOutlineMesh->addBox(kep::Vector3(), kep::Vector3(nmgen.m_volX * nmgen.m_voxelSize + nmgen.m_offset.x,
+                                                                          nmgen.m_volY * nmgen.m_voxelSize + nmgen.m_offset.y,
+                                                                          nmgen.m_volZ * nmgen.m_voxelSize + nmgen.m_offset.z));
+    m_core->m_voxelVolumeOutlineMesh->gen();
+    
+    refEntity = new Entity(this, "voxel volume outline");
     refTransform = (Transform*)refEntity->addComponent(new Transform(
                                         kep::Vector3(0.0f, 0.0f, 0.0f),
                                         kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
                                         kep::Vector3(1.0f, 1.0f, 1.0f)
                                         ));
-    refEntity->addComponent(new Render(m_core->m_triangleMesh, m_core->m_shaderDefault, NULL, RenderMode::SOLID));
-    
-    //printf("%f \n", m_core->m_triangleMesh->m_dataV[0]);
-    //GENERATOR
-    deway::NMGen nmgen(m_core->m_triangleMesh->m_dataV, m_core->m_triangleMesh->m_dataN, m_core->m_triangleMesh->m_numVertices,
-        30, 30, 30, 0.5f);
-    
+    refEntity->addComponent(new Render(m_core->m_voxelVolumeOutlineMesh, m_core->m_shaderMinimal, NULL, RenderMode::WIRE));
     
     //TEST VOLUME VISUALIZATION
-    for(int i = 0; i<nmgen.m_numOverlapVoxel; i++)
+    for(int i = 0; i<nmgen.m_numOverlapVoxels; i++)
     {
         m_core->m_voxelVolumeMesh->addBox(nmgen.m_overlapVoxels[i]->c, nmgen.m_overlapVoxels[i]->hs);
     }
     
 //     for(int i = 0; i<nmgen.m_numVoxel; i++)
 //     {
-//         m_core->m_voxelVolumeMesh->addBox(nmgen.m_voxelVolume[i].c, nmgen.m_voxelVolume[i].hs);
+//         m_core->m_voxelVolumeMesh->addBox(nmgen.m_voxels[i].c, nmgen.m_voxels[i].hs);
 //     }
     m_core->m_voxelVolumeMesh->gen();
     

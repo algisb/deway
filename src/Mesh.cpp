@@ -121,7 +121,7 @@ void MeshGen::gen()
         
         //gen normal
         m_dataN = new float[m_numVertices*3];
-        printf("%d \n", m_numVertices*3);
+
         for(int i = 0; i< m_numVertices*3; i = i + 3*3)
         {
             kep::Vector3 p[3];
@@ -136,7 +136,6 @@ void MeshGen::gen()
                 for(int j = 0; j<3; j++)
                 m_dataN[i+k+j] = n.data[j];
         }
-        printf("%f %f %f \n", m_dataN[0], m_dataN[1], m_dataN[2]);
         glGenBuffers(1, &m_vboN);
         glBindBuffer(GL_ARRAY_BUFFER, m_vboN);
         glBufferData(GL_ARRAY_BUFFER, sizeof(float) * m_numVertices * 3, m_dataN, GL_STATIC_DRAW);
