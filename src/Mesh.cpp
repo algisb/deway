@@ -58,6 +58,7 @@ MeshGen::MeshGen()
 MeshGen::~MeshGen()
 {
     clear();
+    delete[] m_dataN;
 }
 
 void MeshGen::addTri(kep::Vector3 _p0, kep::Vector3 _p1, kep::Vector3 _p2)
@@ -112,15 +113,37 @@ void MeshGen::gen()
         m_numVertices = m_verticies.size();
         m_dataV = &m_verticies[0].data[0];
         
-//         printf("atcual: %f  \n casted: %f \n", m_verticies[0].data[0], m_dataV[0]);
-//         
-//         printf("atcual: %f  \n casted: %f \n", m_verticies[0].data[1], m_dataV[1]);
         glGenBuffers(1, &m_vboV);
         glBindBuffer(GL_ARRAY_BUFFER, m_vboV);
         glBufferData(GL_ARRAY_BUFFER, sizeof(kep::Vector3) * m_verticies.size(), &m_verticies[0], GL_STATIC_DRAW);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
         glEnableVertexAttribArray(0);
+        
+        //gen normal
+        m_dataN = new float[m_numVertices*3];
+        printf("%d \n", m_numVertices*3);
+        for(int i = 0; i< m_numVertices*3; i = i + 3*3)
+        {
+            kep::Vector3 p[3];
+                for(int k = 0; k<9; k = k + 3)
+                    p[k/3] = kep::Vector3(m_dataV[i+k+0], m_dataV[i+k+1], m_dataV[i+k+2]);
+                
+            kep::Vector3 v1 = p[1] - p[0];
+            kep::Vector3 v2 = p[2] - p[0];
+            kep::Vector3 n = kep::cross(v1,v2).normalized();
+            
+            for(int k = 0; k<9; k = k + 3)
+                for(int j = 0; j<3; j++)
+                m_dataN[i+k+j] = n.data[j];
+        }
+        printf("%f %f %f \n", m_dataN[0], m_dataN[1], m_dataN[2]);
+        glGenBuffers(1, &m_vboN);
+        glBindBuffer(GL_ARRAY_BUFFER, m_vboN);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * m_numVertices * 3, m_dataN, GL_STATIC_DRAW);
 
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(1);
+        
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
     }
@@ -190,28 +213,6 @@ void MeshGenLine::gen()
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
     }
-    
-//     for(int i = 0; i< m_numVertices*3; i = i + 3*3)
-//     {
-//         kep::Vector3 p[3];
-//             for(int k = 0; k<9; k = k + 3)
-//                 p[k/3] = kep::Vector3(m_dataV[i+k+0], m_dataV[i+k+1], m_dataV[i+k+2]);
-//             
-//         kep::Vector3 v1 = p[1] - p[0];
-//         kep::Vector3 v2 = p[2] - p[0];
-//         kep::Vector3 n = kep::cross(v1,v2).normalized();
-//         
-//         for(int k = 0; k<9; k = k + 3)
-//             for(int j = 0; j<3; j++)
-//             m_dataN[i+k+j] = n.data[j];
-//     }
-// 
-//     glGenBuffers(1, &m_vboN);
-//     glBindBuffer(GL_ARRAY_BUFFER, m_vboN);
-//     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * m_numVertices * 3, m_dataN, GL_STATIC_DRAW);
-// 
-//     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
-//     glEnableVertexAttribArray(1);
     
 }
 

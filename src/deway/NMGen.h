@@ -17,7 +17,7 @@ namespace deway
         
         float m_voxelSize;
         uint64_t m_numVoxel;
-        Box * m_voxelVolume;
+        Box * m_voxels;
         
         uint64_t m_numOverlapVoxel;
         Box * m_overlapVoxels;

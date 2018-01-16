@@ -59,12 +59,10 @@ World_0::World_0(Core * _core) : World(_core)
                                         ));
     refEntity->addComponent(new Render(m_core->m_triangleMesh, m_core->m_shaderDefault, NULL, RenderMode::SOLID));
     
-    printf("%f \n", m_core->m_triangleMesh->m_dataV[0]);
+    //printf("%f \n", m_core->m_triangleMesh->m_dataV[0]);
     //GENERATOR
     deway::NMGen nmgen(m_core->m_triangleMesh->m_dataV, m_core->m_triangleMesh->m_dataN, m_core->m_triangleMesh->m_numVertices,
         30, 30, 30, 0.5f);
-    
-
     
     
     //TEST VOLUME VISUALIZATION
