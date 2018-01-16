@@ -1,7 +1,7 @@
 #include "NMGen.h"
 using namespace deway;
-NMGen::NMGen(float * _vertexData, float * _normalData, uint64_t _numVertex,
-    uint64_t _volX, uint64_t _volY, uint64_t _volZ, float _voxelSize)
+NMGen::NMGen(float * _vertexData, float * _normalData, uint _numVertex,
+    uint _volX, uint _volY, uint _volZ, float _voxelSize)
 {
     float * dataV = _vertexData;
     float * dataN = _normalData;
@@ -9,7 +9,7 @@ NMGen::NMGen(float * _vertexData, float * _normalData, uint64_t _numVertex,
     m_numTriangles = _numVertex/3;
     m_triangles = new Triangle[m_numTriangles];
     
-    for(uint64_t i = 0; i < _numVertex*3; i = i + 9)
+    for(uint i = 0; i < _numVertex*3; i = i + 9)
     {
         m_triangles[i/9] = Triangle(kep::Vector3( dataV[i+0], dataV[i+1], dataV[i+2]),
                             kep::Vector3( dataV[i+3], dataV[i+4], dataV[i+5]),
@@ -26,8 +26,8 @@ NMGen::NMGen(float * _vertexData, float * _normalData, uint64_t _numVertex,
     m_volZ = _volZ;
     m_numVoxel = m_volX * m_volY * m_volZ; 
     m_voxelSize = _voxelSize;
-    m_voxels = new Box[m_numVoxel];
-    m_overlapVoxels = new Box[m_numVoxel];
+    m_voxels = new Voxel[m_numVoxel];
+    m_overlapVoxels = NULL;
     m_numOverlapVoxel = 0;
     voxelize();
     
@@ -39,28 +39,41 @@ NMGen::~NMGen()
 void NMGen::voxelize()
 {
     genVoxelVolume();
-    for(uint64_t i = 0; i<m_numVoxel; i++)
+    
+    //flag overlaping voxels
+    for(uint i = 0; i<m_numVoxel; i++)
     {
-        for(uint64_t j = 0; j<m_numTriangles; j++)
+        for(uint j = 0; j<m_numTriangles; j++)
         {
             if(triBoxTest(m_triangles[j], m_voxels[i]) == 1)
             {
-                m_overlapVoxels[m_numOverlapVoxel].c = m_voxels[i].c;
-                m_overlapVoxels[m_numOverlapVoxel].hs = m_voxels[i].hs;
+                m_voxels[i].overlaps = true;
                 m_numOverlapVoxel++;
             }
+        }
+    }
+    
+    //get a list of referances to the overlaping voxels
+    uint iter = 0;
+    m_overlapVoxels = new Voxel*[m_numOverlapVoxel];
+    for(uint i = 0; i<m_numVoxel; i++)
+    {
+        if(m_voxels[i].overlaps == true)
+        {
+            m_overlapVoxels[iter] = &m_voxels[i];
+            iter++;
         }
     }
     
 }
 void NMGen::genVoxelVolume()
 {
-    uint64_t iter = 0;
+    uint iter = 0;
     for(int x = 0; x<m_volX; x++)
         for(int y = 0; y<m_volY; y++)
             for(int z = 0; z<m_volZ; z++)
             {
-                m_voxels[iter] = Box(kep::Vector3(((float)x * m_voxelSize * 2) - ((m_voxelSize * 2 *m_volX)/2) + m_voxelSize, ((float)y * m_voxelSize * 2) - ((m_voxelSize * 2 *m_volX)/2) + m_voxelSize, ((float)z * m_voxelSize * 2) - ((m_voxelSize * 2 *m_volX)/2) + m_voxelSize) , kep::Vector3(m_voxelSize, m_voxelSize, m_voxelSize));
+                m_voxels[iter] = Voxel(kep::Vector3(((float)x * m_voxelSize * 2) - ((m_voxelSize * 2 *m_volX)/2) + m_voxelSize, ((float)y * m_voxelSize * 2) - ((m_voxelSize * 2 *m_volX)/2) + m_voxelSize, ((float)z * m_voxelSize * 2) - ((m_voxelSize * 2 *m_volX)/2) + m_voxelSize) , kep::Vector3(m_voxelSize, m_voxelSize, m_voxelSize));
                 iter++;
             }
 }

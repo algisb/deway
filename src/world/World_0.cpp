@@ -68,7 +68,7 @@ World_0::World_0(Core * _core) : World(_core)
     //TEST VOLUME VISUALIZATION
     for(int i = 0; i<nmgen.m_numOverlapVoxel; i++)
     {
-        m_core->m_voxelVolumeMesh->addBox(nmgen.m_overlapVoxels[i].c, nmgen.m_overlapVoxels[i].hs);
+        m_core->m_voxelVolumeMesh->addBox(nmgen.m_overlapVoxels[i]->c, nmgen.m_overlapVoxels[i]->hs);
     }
     
 //     for(int i = 0; i<nmgen.m_numVoxel; i++)

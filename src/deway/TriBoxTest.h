@@ -1,7 +1,7 @@
 #ifndef TRIBOXTEST_H_
 #define TRIBOXTEST_H_
 #include "Triangle.h"
-#include "Box.h"
+#include "Voxel.h"
 namespace deway
 {
     /********************************************************/
@@ -331,7 +331,7 @@ namespace deway
 
     }
     
-    int triBoxTest(Triangle _t, Box _b);
+    int triBoxTest(Triangle _t, Voxel _v);
     
 }
 

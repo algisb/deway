@@ -10,18 +10,18 @@
     p[2] = kep::dot(_axis, t.p[2]);\
     float min,max;\
     FINDMINMAX(p[0], p[1], p[2], min, max);\
-    float r = _b.hs.x* abs(_axis.x) + _b.hs.y * abs(_axis.y) + _b.hs.z * abs(_axis.z);\
+    float r = _v.hs.x* abs(_axis.x) + _v.hs.y * abs(_axis.y) + _v.hs.z * abs(_axis.z);\
     if(min>r || max<-r) return 0;\
 }
 
 
 
-int deway::triBoxTest(Triangle _t, Box _b)
+int deway::triBoxTest(Triangle _t, Voxel _v)
 {
     //shift the box to origin
     Triangle t = _t;
     for(int i = 0; i < 3; i++)
-        t.p[i] = t.p[i] - _b.c;
+        t.p[i] = t.p[i] - _v.c;
     
     kep::Vector3 e[3];
     e[0] = t.p[1] - t.p[0];
