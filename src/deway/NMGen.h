@@ -17,6 +17,7 @@ namespace deway
         uint m_volZ;
         
         float m_voxelSize;
+        float m_maxSlope;
         uint m_numVoxel;
         Voxel * m_voxels;
         
@@ -24,10 +25,12 @@ namespace deway
         Voxel ** m_overlapVoxels;//array of poiters holding referances
         kep::Vector3 m_offset; //voxel volume offset from world origin
         
-        NMGen(float * _vertexData, float * _normalData, uint _numVertex, uint _volX, uint _volY, uint _volZ, float _voxelSize, kep::Vector3 _offset);
+        NMGen(float * _vertexData, float * _normalData, uint _numVertex, uint _volX, uint _volY, uint _volZ, float _voxelSize,float _maxSlope, kep::Vector3 _offset);
         ~NMGen();
-        void voxelize();
         void genVoxelVolume();
+        bool slopeCheck(Triangle * _t);
+        void voxelize();
+        
         
     };
 };

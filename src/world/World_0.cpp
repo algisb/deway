@@ -62,12 +62,18 @@ World_0::World_0(Core * _core) : World(_core)
     //GENERATOR
     Mesh * polySoup = m_core->m_sandBox;
     deway::NMGen nmgen(polySoup->m_dataV, polySoup->m_dataN, polySoup->m_numVertices,
-        80, 10, 80, 0.3f, kep::Vector3(1.3f, 0.0f, 0.0f));
+        80, 30, 80, //volume dimensions
+        0.3f, //voxel size
+        0.8f, //max slope incline
+        kep::Vector3(0.0f, 5.0f, 0.0f));
     
     
-    m_core->m_voxelVolumeOutlineMesh->addBox(kep::Vector3(), kep::Vector3(nmgen.m_volX * nmgen.m_voxelSize + nmgen.m_offset.x,
-                                                                          nmgen.m_volY * nmgen.m_voxelSize + nmgen.m_offset.y,
-                                                                          nmgen.m_volZ * nmgen.m_voxelSize + nmgen.m_offset.z));
+    m_core->m_voxelVolumeOutlineMesh->addBox(kep::Vector3(nmgen.m_offset.x, 
+                                                          nmgen.m_offset.y, 
+                                                          nmgen.m_offset.z), 
+                                             kep::Vector3(nmgen.m_volX * nmgen.m_voxelSize,
+                                                          nmgen.m_volY * nmgen.m_voxelSize,
+                                                          nmgen.m_volZ * nmgen.m_voxelSize));
     m_core->m_voxelVolumeOutlineMesh->gen();
     
     refEntity = new Entity(this, "voxel volume outline");
