@@ -71,9 +71,22 @@ if(x2>max) max=x2;
             
             return 1;
         }
-        inline int aabbTest(AABB _aabb)
+        inline int aabbTest(AABB * _aabb)
         {
-            return 1;
+            float max0[3], min0[3], 
+                  max1[3], min1[3];
+                  
+            for(int i = 0; i<3; i++)
+            {
+                max0[i] = c.data[i] + hs.data[i]; 
+                min0[i] = c.data[i] - hs.data[i];
+                max1[i] = _aabb->c.data[i] + _aabb->hs.data[i]; 
+                min1[i] = _aabb->c.data[i] - _aabb->hs.data[i];
+            }
+              if((min0[0] <= max1[0] && max0[0] >= min1[0]) && (min0[1] <= max1[1] && max0[1] >= min1[1]) && (min0[2] <= max1[2] && max0[2] >= min1[2]))
+                  return 1;
+              else
+                  return 0;
         }
     };
 };
