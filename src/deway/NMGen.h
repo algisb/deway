@@ -2,7 +2,6 @@
 #define NMGEN_H_
 #include "Triangle.h"
 #include "Voxel.h"
-#include "TriBoxTest.h"
 
 namespace deway
 { 

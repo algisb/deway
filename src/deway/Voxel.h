@@ -1,15 +1,20 @@
 #ifndef VOXEL_DEWAY_H_
 #define VOXEL_DEWAY_H_
-#include "Core.h"
+#include "AABB.h"
 namespace deway 
 {
     class Voxel
     {
     public:
-        kep::Vector3 c;//center
-        kep::Vector3 hs;//halfsize
+        AABB aabb;
         bool overlaps;
-        Voxel(kep::Vector3 _center = kep::Vector3(0.0f, 0.0f, 0.0f), kep::Vector3 _halfSize = kep::Vector3(0.0f, 0.0f, 0.0f));
+        
+//         union
+//         {
+//             Voxel * nghbr[26];
+//         };
+        
+        Voxel(AABB _aabb = AABB());
         ~Voxel();
         
     };
