@@ -51,7 +51,7 @@ World_0::World_0(Core * _core) : World(_core)
     //GENERATOR
     
     deway::NMGen nmgen(polySoup->m_dataV, polySoup->m_dataN, polySoup->m_numVertices,
-        80, 30, 80, //volume dimensions
+        80, 30, 80, false, //volume dimensions
         0.3f, //voxel size
         0.8f, //max slope incline
         kep::Vector3(0.0f, 5.0f, 0.0f));
@@ -86,8 +86,14 @@ World_0::World_0(Core * _core) : World(_core)
     //TEST VOLUME VISUALIZATION
     for(int i = 0; i<nmgen.m_numOverlapVoxels; i++)
     {
-        m_core->m_voxelVolumeMesh->addBox(nmgen.m_overlapVoxels[i]->aabb.c, nmgen.m_overlapVoxels[i]->aabb.hs);
+        m_core->m_voxelVolumeMesh->addTopQuad(nmgen.m_overlapVoxels[i]->aabb.c, nmgen.m_overlapVoxels[i]->aabb.hs);
     }
+    
+//     for(int i = 0; i<nmgen.m_numVoxel; i++)
+//     {
+//         m_core->m_voxelVolumeMesh->addBox(nmgen.m_voxels[i].aabb.c, nmgen.m_voxels[i].aabb.hs);
+//     }
+    
     m_core->m_voxelVolumeMesh->gen();
     
     refEntity = new Entity(this, "voxel volume");

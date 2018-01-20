@@ -26,7 +26,7 @@ using namespace deway;
 
 
 NMGen::NMGen(float * _vertexData, float * _normalData, uint _numVertex,
-    uint _volX, uint _volY, uint _volZ, float _voxelSize,float _maxSlope, kep::Vector3 _offset)
+    uint _volX, uint _volY, uint _volZ, bool _autoVol, float _voxelSize,float _maxSlope, kep::Vector3 _offset)
 {
     float * dataV = _vertexData;
     float * dataN = _normalData;
@@ -42,16 +42,26 @@ NMGen::NMGen(float * _vertexData, float * _normalData, uint _numVertex,
         m_triangles[i/9].n    = kep::Vector3( dataN[i+0], dataN[i+1], dataN[i+2]);
         m_triangles[i/9].genAABB();//generate bounding box
     }
+    
+    
     m_volX = _volX;
     m_volY = _volY;
     m_volZ = _volZ;
-    m_numVoxel = m_volX * m_volY * m_volZ; 
+    
+    
+    
     m_voxelSize = _voxelSize;
-    m_voxels = new Voxel[m_numVoxel];
+    
     m_overlapVoxels = NULL;
     m_numOverlapVoxels = 0;
     m_offset = _offset;
     m_maxSlope = _maxSlope;
+    m_numVoxel = m_volX * m_volY * m_volZ;
+    if(_autoVol)
+        autoSizeVoxelVolume();
+    m_voxels = new Voxel[m_numVoxel];
+    
+    
     
     voxelize();
     
@@ -61,6 +71,42 @@ NMGen::~NMGen()
     delete[] m_triangles;
     delete[] m_overlapVoxels;
 }
+
+void NMGen::genSpans()
+{
+
+}
+void NMGen::autoSizeVoxelVolume()
+{
+    //Find the mesh center
+    float d3 = 1.0f/(((float)m_numTriangles)*3.0f);
+    kep::Vector3 c;
+    for(uint i = 0; i<m_numTriangles; i++)
+        for(uint j = 0; j<3; j++)
+        {
+            c = c + m_triangles[i].p[j];
+        }
+        c = c * d3;
+    
+    c.dump();
+    float max[3]={0.0f};
+    for(uint i = 0; i<m_numTriangles; i++)
+        for(uint j = 0; j<3; j++)
+            for(uint k = 0; k<3; k++)
+            {
+                float data = std::abs(m_triangles[i].p[j].data[k] - c.data[k]);
+                if(data > max[k])
+                    max[k] = data;
+            }
+    m_offset = c;
+    m_volX = (uint)((max[0]) / (m_voxelSize))+1;
+    m_volY = (uint)((max[1]) / (m_voxelSize))+1;
+    m_volZ = (uint)((max[2]) / (m_voxelSize))+1;
+    m_numVoxel = m_volX * m_volY * m_volZ; 
+    printf("%u %u %u\n", m_volX, m_volY, m_volZ);
+}
+
+
 void NMGen::genVoxelVolume()
 {
     uint iter = 0;

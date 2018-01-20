@@ -24,8 +24,10 @@ namespace deway
         Voxel ** m_overlapVoxels;//array of poiters holding referances
         kep::Vector3 m_offset; //voxel volume offset from world origin
         
-        NMGen(float * _vertexData, float * _normalData, uint _numVertex, uint _volX, uint _volY, uint _volZ, float _voxelSize,float _maxSlope, kep::Vector3 _offset);
+        NMGen(float * _vertexData, float * _normalData, uint _numVertex, uint _volX, uint _volY, uint _volZ,bool _autoVol, float _voxelSize,float _maxSlope, kep::Vector3 _offset);
         ~NMGen();
+        void genSpans();
+        void autoSizeVoxelVolume();
         void genVoxelVolume();
         bool slopeCheck(Triangle * _t);
         void voxelize();

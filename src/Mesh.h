@@ -46,6 +46,7 @@ namespace kelp
         ~MeshGenLine();
         void addLine(kep::Vector3 _p0, kep::Vector3 _p1);
         void addBox(kep::Vector3 _center, kep::Vector3 _halfSize);
+        void addTopQuad(kep::Vector3 _center, kep::Vector3 _halfSize);
         void gen();
     };
     

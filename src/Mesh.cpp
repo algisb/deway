@@ -191,6 +191,20 @@ void MeshGenLine::addBox(kep::Vector3 _center, kep::Vector3 _halfSize)
     addLine(p[3], p[7]);
 }
 
+void MeshGenLine::addTopQuad(kep::Vector3 _center, kep::Vector3 _halfSize)
+{
+    kep::Vector3 p[4];
+    p[0] = _center + kep::Vector3(_halfSize.x, _halfSize.y, _halfSize.z);
+    p[1] = _center + kep::Vector3(-_halfSize.x, _halfSize.y, _halfSize.z);
+    p[2] = _center + kep::Vector3(-_halfSize.x, _halfSize.y, -_halfSize.z);
+    p[3] = _center + kep::Vector3(_halfSize.x, _halfSize.y, -_halfSize.z);
+    
+    addLine(p[0], p[1]);
+    addLine(p[1], p[2]);
+    addLine(p[2], p[3]);
+    addLine(p[3], p[0]);
+}
+
 void MeshGenLine::gen()
 {
     ///////////////////////////////////
