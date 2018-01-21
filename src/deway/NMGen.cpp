@@ -25,8 +25,7 @@ using namespace deway;
 }
 
 
-NMGen::NMGen(float * _vertexData, float * _normalData, uint _numVertex,
-    uint _volX, uint _volY, uint _volZ, bool _autoVol, float _voxelSize,float _maxSlope, kep::Vector3 _offset)
+NMGen::NMGen(float * _vertexData, float * _normalData, uint _numVertex, uint _volX, uint _volY, uint _volZ, kep::Vector3 _offset, bool _autoSizeVolume, float _voxelSize,float _maxSlope)
 {
     float * dataV = _vertexData;
     float * dataN = _normalData;
@@ -57,11 +56,12 @@ NMGen::NMGen(float * _vertexData, float * _normalData, uint _numVertex,
     m_offset = _offset;
     m_maxSlope = _maxSlope;
     m_numVoxel = m_volX * m_volY * m_volZ;
-    if(_autoVol)
+    if(_autoSizeVolume)
         autoSizeVoxelVolume();
     m_voxels = new Voxel[m_numVoxel];
     
-    
+
+    genSpans();
     
     voxelize();
     
@@ -70,11 +70,15 @@ NMGen::~NMGen()
 {
     delete[] m_triangles;
     delete[] m_overlapVoxels;
+    delete[] m_spans;
 }
 
 void NMGen::genSpans()
 {
-
+    m_numSpans = m_volX * m_volZ;
+    m_spans = new Span[m_numSpans];
+    for(uint i = 0; i<m_numSpans; i++)
+        m_spans[i].gen(m_volY);
 }
 void NMGen::autoSizeVoxelVolume()
 {
@@ -88,7 +92,6 @@ void NMGen::autoSizeVoxelVolume()
         }
         c = c * d3;
     
-    c.dump();
     float max[3]={0.0f};
     for(uint i = 0; i<m_numTriangles; i++)
         for(uint j = 0; j<3; j++)
@@ -103,23 +106,28 @@ void NMGen::autoSizeVoxelVolume()
     m_volY = (uint)((max[1]) / (m_voxelSize))+1;
     m_volZ = (uint)((max[2]) / (m_voxelSize))+1;
     m_numVoxel = m_volX * m_volY * m_volZ; 
-    printf("%u %u %u\n", m_volX, m_volY, m_volZ);
+    
 }
 
 
 void NMGen::genVoxelVolume()
 {
     uint iter = 0;
-    for(int y = 0; y<m_volY; y++)
-        for(int x = 0; x<m_volX; x++)
-            for(int z = 0; z<m_volZ; z++)
+    for(uint y = 0; y<m_volY; y++)
+    {
+        uint xz = 0;
+        for(uint x = 0; x<m_volX; x++)
+            for(uint z = 0; z<m_volZ; z++)
             {
                 m_voxels[iter] = Voxel(AABB(kep::Vector3(((float)x * m_voxelSize * 2) - ((m_voxelSize * 2 *m_volX)/2) + m_voxelSize + m_offset.x, 
                                                     ((float)y * m_voxelSize * 2) - ((m_voxelSize * 2 *m_volY)/2) + m_voxelSize + m_offset.y, 
                                                     ((float)z * m_voxelSize * 2) - ((m_voxelSize * 2 *m_volZ)/2) + m_voxelSize + m_offset.z),
                                        kep::Vector3(m_voxelSize, m_voxelSize, m_voxelSize)));
+                m_spans[xz].m_voxels[y] = &m_voxels[iter];
                 iter++;
+                xz++;
             }
+    }
             
 }
 bool NMGen::slopeCheck(Triangle * _t)
@@ -140,8 +148,10 @@ void NMGen::voxelize()
     m_voxels[0].aabb.triTest(&m_triangles[0]);
     );
     printf("----Voxelizer info----\n");
+    printf("Vox vol dimensions: %u %u %u\n", m_volX, m_volY, m_volZ);
     printf("Num vox: %u \n", m_numVoxel);
     printf("Num tri: %u \n", m_numTriangles);
+    printf("Num test: %u \n", m_numVoxel*m_numTriangles);
     printf("vox-tri time: %f \n", singleExecTime);
     printf("Est worst-case vox time: %f \n", singleExecTime * m_numVoxel * m_numTriangles);
     

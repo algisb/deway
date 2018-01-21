@@ -1,11 +1,12 @@
 #ifndef NMGEN_H_
 #define NMGEN_H_
 #include "Triangle.h"
-#include "Voxel.h"
+#include "Span.h"
+#include "typedefs.h"
 
 namespace deway
 { 
-    typedef uint32_t uint;
+
     class NMGen
     {
     public:
@@ -24,7 +25,10 @@ namespace deway
         Voxel ** m_overlapVoxels;//array of poiters holding referances
         kep::Vector3 m_offset; //voxel volume offset from world origin
         
-        NMGen(float * _vertexData, float * _normalData, uint _numVertex, uint _volX, uint _volY, uint _volZ,bool _autoVol, float _voxelSize,float _maxSlope, kep::Vector3 _offset);
+        uint m_numSpans;
+        Span * m_spans;
+        
+        NMGen(float * _vertexData, float * _normalData, uint _numVertex, uint _volX, uint _volY, uint _volZ, kep::Vector3 _offset, bool _autoSizeVolume, float _voxelSize,float _maxSlope);
         ~NMGen();
         void genSpans();
         void autoSizeVoxelVolume();
