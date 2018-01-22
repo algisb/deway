@@ -102,9 +102,33 @@ void NMGen::autoSizeVoxelVolume()
                     max[k] = data;
             }
     m_offset = c;
-    m_volX = (uint)((max[0]) / (m_voxelSize))+1;
-    m_volY = (uint)((max[1]) / (m_voxelSize))+1;
-    m_volZ = (uint)((max[2]) / (m_voxelSize))+1;
+//     m_volX = (uint)((max[0]) / (m_voxelSize))+1;
+//     m_volY = (uint)((max[1]) / (m_voxelSize))+1;
+//     m_volZ = (uint)((max[2]) / (m_voxelSize))+1;
+    
+    m_volX = 0;
+    
+    while(1)
+    {
+        if( (((m_volX * (m_voxelSize*2))/2)) > max[0] )
+            break;
+        m_volX++;
+    }
+    m_volY = 0;
+    while(1)
+    {
+        if( (((m_volY *(m_voxelSize*2))/2)) > max[1] )
+            break;
+        m_volY++;
+    }
+    
+    m_volZ = 0;
+    while(1)
+    {
+        if( (((m_volZ * (m_voxelSize*2))/2)) > max[2] )
+            break;
+        m_volZ++;
+    }
     m_numVoxel = m_volX * m_volY * m_volZ; 
     
 }

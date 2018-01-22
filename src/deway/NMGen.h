@@ -16,7 +16,7 @@ namespace deway
         uint m_volY;
         uint m_volZ;
         
-        float m_voxelSize;
+        float m_voxelSize;//this is a HALF-LENGTH
         float m_maxSlope;
         uint m_numVoxel;
         Voxel * m_voxels;
