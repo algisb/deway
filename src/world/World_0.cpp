@@ -10,6 +10,8 @@
 #include "kep/collisionDetection/finephase/OBBCollider.h"
 #include "kep/collisionDetection/finephase/MeshCollider.h"
 #include "deway/NMGen.h"
+#include "deway/AABB.h"
+
 using namespace kelp;
 
 World_0::World_0(Core * _core) : World(_core)
@@ -88,7 +90,7 @@ World_0::World_0(Core * _core) : World(_core)
     //TEST VOLUME VISUALIZATION
     for(int i = 0; i<nmgen.m_numOverlapVoxels; i++)
     {
-        m_core->m_voxelVolumeMesh->addTopQuad(nmgen.m_overlapVoxels[i]->aabb.c, nmgen.m_overlapVoxels[i]->aabb.hs);
+        m_core->m_voxelVolumeMesh->addTopQuad(nmgen.m_overlapVoxels[i]->aabb->c, nmgen.m_overlapVoxels[i]->aabb->hs);
     }
     
 //     for(int i = 0; i<nmgen.m_numVoxel; i++)

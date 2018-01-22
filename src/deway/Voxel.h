@@ -1,21 +1,23 @@
 #ifndef VOXEL_DEWAY_H_
 #define VOXEL_DEWAY_H_
-#include "AABB.h"
+
 namespace deway 
 {
+    class AABB;
     class Voxel
     {
     public:
-        AABB aabb;
+        AABB * aabb;
         bool overlaps;
         
 //         union
 //         {
 //             Voxel * nghbr[26];
 //         };
-        
-        Voxel(AABB _aabb = AABB());
+        Voxel();
+        //Voxel(AABB _aabb = AABB());
         ~Voxel();
+        void genAABB(AABB _aabb);
         
     };
 };

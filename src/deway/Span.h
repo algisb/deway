@@ -1,9 +1,10 @@
 #ifndef SPAN_DEWAY_H_
 #define SPAN_DEWAY_H_
 #include "typedefs.h"
-#include "Voxel.h"
+
 namespace deway 
 {
+    class Voxel;
     class Span //A coloumn of voxels in Y direction
     {
     public:

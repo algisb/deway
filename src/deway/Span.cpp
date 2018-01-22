@@ -1,4 +1,6 @@
 #include "Span.h"
+#include "Voxel.h"
+#include <stdlib.h>
 using namespace deway;
 Span::Span()
 {

@@ -2,6 +2,8 @@
 #define AABB_DEWAY_H_
 #include "Core.h"
 #include "Triangle.h"
+#include "Span.h"
+#include "Voxel.h"
 namespace deway
 {
 #define FINDMINMAX(x0,x1,x2,min,max) \
@@ -87,6 +89,28 @@ if(x2>max) max=x2;
                   return 1;
               else
                   return 0;
+        }
+        inline int spanTest(Span * _span)
+        {
+            AABB * aabb = _span->m_voxels[0]->aabb;
+            float max0[2], min0[2], 
+                  max1[2], min1[2];
+                  
+
+            max0[0] = c.data[0] + hs.data[0]; 
+            min0[0] = c.data[0] - hs.data[0];
+            max1[0] = aabb->c.data[0] + aabb->hs.data[0]; 
+            min1[0] = aabb->c.data[0] - aabb->hs.data[0];
+            
+            max0[1] = c.data[2] + hs.data[2]; 
+            min0[1] = c.data[2] - hs.data[2];
+            max1[1] = aabb->c.data[2] + aabb->hs.data[2]; 
+            min1[1] = aabb->c.data[2] - aabb->hs.data[2];
+            
+            if((min0[0] <= max1[0] && max0[0] >= min1[0]) && (min0[1] <= max1[1] && max0[1] >= min1[1]) )
+                return 1;
+            else
+                return 0;
         }
     };
 };

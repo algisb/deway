@@ -2,6 +2,7 @@
 #define NMGEN_H_
 #include "Triangle.h"
 #include "Span.h"
+#include "Voxel.h"
 #include "typedefs.h"
 
 namespace deway
@@ -35,8 +36,6 @@ namespace deway
         void genVoxelVolume();
         bool slopeCheck(Triangle * _t);
         void voxelize();
-        
-        
     };
 };
 
