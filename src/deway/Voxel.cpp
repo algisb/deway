@@ -5,7 +5,9 @@ using namespace deway;
 Voxel::Voxel()
 {
     aabb = NULL;
-    overlaps = false;
+    //overlaps = false;
+    traversable = false;
+    blacklisted = false;
 }
 Voxel::~Voxel()
 {

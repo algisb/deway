@@ -8,7 +8,9 @@ namespace deway
     {
     public:
         AABB * aabb;
-        bool overlaps;
+        bool overlaps; // flaged if overlaps anything
+        bool traversable;
+        bool blacklisted; //
         
 //         union
 //         {

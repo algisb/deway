@@ -33,6 +33,16 @@ World_0::World_0(Core * _core) : World(_core)
     plight->addComponent(new LightPoint(m_core->m_shaderDefault, 50.0f, kep::Vector3(0.0f, 0.0f, 0.0f)));
     plight->addComponent(new Render(m_core->m_sphereMesh, m_core->m_shaderMinimal, NULL, RenderMode::SOLID));
     
+    
+    plight = new Entity(this, "Point Light");
+    plight->addComponent(new Transform(
+                                        kep::Vector3(5.0f, 12.0f, 5.0f),
+                                        kep::Quaternion(), 
+                                        kep::Vector3(0.2f, 0.2f, 0.2f)
+                                        ));
+    plight->addComponent(new LightPoint(m_core->m_shaderDefault, 50.0f, kep::Vector3(0.0f, 0.0f, 0.0f)));
+    plight->addComponent(new Render(m_core->m_sphereMesh, m_core->m_shaderMinimal, NULL, RenderMode::SOLID));
+    
    /////////////////////////////////////////////////////////////////////////
     
     //TEST TRIANGLE
@@ -56,8 +66,9 @@ World_0::World_0(Core * _core) : World(_core)
         80, 30, 80, //volume dimensions
         kep::Vector3(0.0f, 5.0f, 0.0f), //volume offset
         true, //auto size the volume
-        0.3f, //voxel size
-        0.8f //max slope incline
+        0.2f, //voxel size
+        0.8f, //max slope incline
+        2.0f //agent height
         );
     
     
@@ -88,9 +99,9 @@ World_0::World_0(Core * _core) : World(_core)
     refEntity->addComponent(new Render(m_core->m_voxelVolumeOutlineMesh, m_core->m_shaderMinimal, NULL, RenderMode::WIRE));
     
     //TEST VOLUME VISUALIZATION
-    for(int i = 0; i<nmgen.m_numOverlapVoxels; i++)
+    for(int i = 0; i<nmgen.m_numTravVoxels; i++)
     {
-        m_core->m_voxelVolumeMesh->addTopQuad(nmgen.m_overlapVoxels[i]->aabb->c, nmgen.m_overlapVoxels[i]->aabb->hs);
+        m_core->m_voxelVolumeMesh->addTopQuad(nmgen.m_travVoxels[i]->aabb->c, nmgen.m_travVoxels[i]->aabb->hs);
     }
     
 //     for(int i = 0; i<nmgen.m_numVoxel; i++)

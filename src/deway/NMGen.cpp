@@ -26,7 +26,7 @@ using namespace deway;
 }
 
 
-NMGen::NMGen(float * _vertexData, float * _normalData, uint _numVertex, uint _volX, uint _volY, uint _volZ, kep::Vector3 _offset, bool _autoSizeVolume, float _voxelSize,float _maxSlope)
+NMGen::NMGen(float * _vertexData, float * _normalData, uint _numVertex, uint _volX, uint _volY, uint _volZ, kep::Vector3 _offset, bool _autoSizeVolume, float _voxelSize,float _maxSlope, float _agentHeight)
 {
     float * dataV = _vertexData;
     float * dataN = _normalData;
@@ -52,25 +52,22 @@ NMGen::NMGen(float * _vertexData, float * _normalData, uint _numVertex, uint _vo
     
     m_voxelSize = _voxelSize;
     
-    m_overlapVoxels = NULL;
-    m_numOverlapVoxels = 0;
+    m_travVoxels = NULL;
+    m_numTravVoxels = 0;
     m_offset = _offset;
     m_maxSlope = _maxSlope;
     m_numVoxel = m_volX * m_volY * m_volZ;
     if(_autoSizeVolume)
         autoSizeVoxelVolume();
     m_voxels = new Voxel[m_numVoxel];
-    
-
-    genSpans();
+    m_agentHeight = _agentHeight;
     
     voxelize();
-    
 }
 NMGen::~NMGen()
 {
     delete[] m_triangles;
-    delete[] m_overlapVoxels;
+    delete[] m_travVoxels;
     delete[] m_spans;
 }
 
@@ -165,8 +162,72 @@ bool NMGen::slopeCheck(Triangle * _t)
     else
         return false;
 }
+
+void NMGen::heightTests()
+{
+    for(uint i = 0; i<m_numSpans; i++)
+    {
+            uint nv = 0;
+            Voxel ** v = new Voxel*[m_spans[i].m_size];
+            
+            //extract overlaping and traversable voxels from the span
+            for(uint j = 0; j<m_spans[i].m_size; j++)
+            {
+                if(m_spans[i].m_voxels[j]->overlaps || m_spans[i].m_voxels[j]->traversable)
+                {
+                    v[nv] = m_spans[i].m_voxels[j];
+                    nv++;
+                }
+            }
+            
+            
+            //perform height checks between the voxels
+            if(nv > 1)//span cointains more than 1 overlaping/traversable voxel
+            {
+                for(uint j = 0; j<nv; j++) //
+                {
+                    if(!v[j]->traversable)//only traversable voxels need height check
+                        continue;
+                        
+                    uint j2 = j+1;
+                    if(j2 > nv-1)//the last voxel does not get tested
+                        break;
+                    
+                    float max0 = v[j]->aabb->c.y + v[j]->aabb->hs.y;
+                    float max1 = v[j2]->aabb->c.y + v[j]->aabb->hs.y;
+                    
+                    float d = std::abs(max1 - max0);
+                    if(d < m_agentHeight)
+                    {
+                         v[j]->traversable = false;
+                         m_numTravVoxels--;
+                    }
+                }
+            }
+            
+            
+            delete [] v;
+    }
+}
+
+void NMGen::getOverlapingRefs()
+{
+    //get a list of refs to the overlaping voxels
+    uint iter = 0;
+    m_travVoxels = new Voxel*[m_numTravVoxels];
+    for(uint i = 0; i<m_numVoxel; i++)
+    {
+        if(m_voxels[i].traversable == true)
+        {
+            m_travVoxels[iter] = &m_voxels[i];
+            iter++;
+        }
+    }
+}
+
 void NMGen::voxelize()
 {
+    genSpans();
     genVoxelVolume();
     
     double singleExecTime = 0.0;
@@ -182,23 +243,7 @@ void NMGen::voxelize()
     printf("Est worst-case vox time: %f \n", singleExecTime * m_numVoxel * m_numTriangles);
     
     double execTime = 0.0;
-    EXEC_TIMER(execTime, 
-    //flag overlaping voxels
-//     for(uint i = 0; i<m_numVoxel; i++)
-//     {
-//         for(uint j = 0; j<m_numTriangles; j++)
-//         {
-//             if(m_voxels[i].aabb->aabbTest(m_triangles[j].aabb) == 1)//MAJOR optimization
-//             {
-//                 if(m_voxels[i].aabb->triTest(&m_triangles[j]) == 1)
-//                     if(m_voxels[i].overlaps == false && slopeCheck(&m_triangles[j]) == true)//0.9 being small slopes, 0.5 big slopes
-//                     {
-//                         m_voxels[i].overlaps = true;
-//                         m_numOverlapVoxels++;
-//                     }
-//             }
-//         }
-//     }
+    EXEC_TIMER(execTime,
     
     for(uint i = 0; i<m_numSpans; i++)
     {
@@ -207,12 +252,21 @@ void NMGen::voxelize()
             if(m_triangles[j].aabb->spanTest(&m_spans[i]) == 1)//MAJOR optimization
             {
                 for(uint k = 0; k<m_spans[i].m_size; k++)
+                {
                     if(m_spans[i].m_voxels[k]->aabb->triTest(&m_triangles[j]) == 1)
-                        if(m_spans[i].m_voxels[k]->overlaps == false && slopeCheck(&m_triangles[j]) == true)//0.9 being small slopes, 0.5 big slopes
+                    {
+                        m_spans[i].m_voxels[k]->overlaps = true;
+                        if(m_spans[i].m_voxels[k]->traversable == false && slopeCheck(&m_triangles[j]) == true && !m_spans[i].m_voxels[k]->blacklisted)//0.9 being small slopes, 0.5 big slopes
                         {
-                            m_spans[i].m_voxels[k]->overlaps = true;
-                            m_numOverlapVoxels++;
+                            m_spans[i].m_voxels[k]->traversable = true;
+                            m_numTravVoxels++;
                         }
+                        else
+                        {
+                            m_spans[i].m_voxels[k]->blacklisted = true;
+                        }
+                    }
+                }
             }
         }
     }
@@ -221,18 +275,9 @@ void NMGen::voxelize()
     );
     printf("Vox time: %f\n", execTime);
     
+    heightTests();
     
-    //get a list of refs to the overlaping voxels
-    uint iter = 0;
-    m_overlapVoxels = new Voxel*[m_numOverlapVoxels];
-    for(uint i = 0; i<m_numVoxel; i++)
-    {
-        if(m_voxels[i].overlaps == true)
-        {
-            m_overlapVoxels[iter] = &m_voxels[i];
-            iter++;
-        }
-    }
+    getOverlapingRefs();
     
 }
 
