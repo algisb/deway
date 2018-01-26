@@ -62,7 +62,18 @@ NMGen::NMGen(float * _vertexData, float * _normalData, uint _numVertex, uint _vo
     m_voxels = new Voxel[m_numVoxel];
     m_agentHeight = _agentHeight;
     
+    
+    genSpans();
+    genVoxelVolume();
+    
+    
     voxelize();
+    
+    findSpanNeighbours();
+    
+    getTraversableVoxels();
+    
+    
 }
 NMGen::~NMGen()
 {
@@ -153,15 +164,7 @@ void NMGen::genVoxelVolume()
     }
             
 }
-bool NMGen::slopeCheck(Triangle * _t)
-{
-    kep::Vector3 up(0.0f, 1.0f, 0.0f);
-    float slope = kep::dot(up, _t->n);
-    if(slope > m_maxSlope /*|| slope < -m_maxSlope*/)
-        return true;
-    else
-        return false;
-}
+
 
 void NMGen::heightTests()
 {
@@ -210,26 +213,26 @@ void NMGen::heightTests()
     }
 }
 
-void NMGen::getOverlapingRefs()
+void NMGen::getTraversableVoxels()
 {
     //get a list of refs to the overlaping voxels
-    uint iter = 0;
-    m_travVoxels = new Voxel*[m_numTravVoxels];
-    for(uint i = 0; i<m_numVoxel; i++)
+    if(m_numTravVoxels > 0)
     {
-        if(m_voxels[i].traversable == true)
+        uint iter = 0;
+        m_travVoxels = new Voxel*[m_numTravVoxels];
+        for(uint i = 0; i<m_numVoxel; i++)
         {
-            m_travVoxels[iter] = &m_voxels[i];
-            iter++;
+            if(m_voxels[i].traversable == true)
+            {
+                m_travVoxels[iter] = &m_voxels[i];
+                iter++;
+            }
         }
     }
 }
 
 void NMGen::voxelize()
 {
-    genSpans();
-    genVoxelVolume();
-    
     double singleExecTime = 0.0;
     EXEC_TIMER(singleExecTime,
     m_voxels[0].aabb->triTest(&m_triangles[0]);
@@ -274,12 +277,48 @@ void NMGen::voxelize()
     
     );
     printf("Vox time: %f\n", execTime);
-    
     heightTests();
-    
-    getOverlapingRefs();
-    
 }
+
+void NMGen::findSpanNeighbours()
+{
+    for(uint x = 0; x < m_volX; x++)
+        for(uint y = 0; y < m_volZ; y++)
+        {
+            Span * c = getSpan(x,y);
+            c->nghbr[0] = getSpan(x,    y+1);
+            c->nghbr[1] = getSpan(x+1,  y+1);
+            c->nghbr[2] = getSpan(x+1,  y);
+            c->nghbr[3] = getSpan(x+1,  y-1);
+            c->nghbr[4] = getSpan(x,    y-1);
+            c->nghbr[5] = getSpan(x-1,  y-1);
+            c->nghbr[6] = getSpan(x-1,  y);
+            c->nghbr[7] = getSpan(x-1,  y+1);
+        }
+
+//     Span * s = getSpan(m_volX-1, m_volZ-1);
+//     for(uint i = 0; i<s->m_size; i++)
+//     {
+//         //s->m_voxels[i]->aabb->c.dump();
+//         s->m_voxels[i]->overlaps = true;
+//         s->m_voxels[i]->traversable = true;
+//         m_numTravVoxels++;
+//     }
+//     
+//     for(uint j = 0; j<8; j++)
+//     {
+//         if(s->nghbr[j] != NULL)
+//         {
+//             for(uint i = 0; i<s->nghbr[j]->m_size; i++)
+//             {
+//                 s->m_voxels[i]->overlaps = true;
+//                 s->nghbr[j]->m_voxels[i]->traversable = true;
+//                 m_numTravVoxels++;
+//             }
+//         }
+//     }
+}
+
 
 
 

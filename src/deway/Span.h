@@ -9,7 +9,8 @@ namespace deway
     {
     public:
         uint m_size;
-        Voxel ** m_voxels; 
+        Voxel ** m_voxels;
+        Span * nghbr[8];
         
         Span();
         ~Span();

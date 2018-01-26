@@ -38,11 +38,35 @@ namespace deway
         void genSpans();
         void autoSizeVoxelVolume();
         void genVoxelVolume();
-        bool slopeCheck(Triangle * _t);
+        inline bool slopeCheck(Triangle * _t)
+        {
+            kep::Vector3 up(0.0f, 1.0f, 0.0f);
+            float slope = kep::dot(up, _t->n);
+            if(slope > m_maxSlope /*|| slope < -m_maxSlope*/)
+                return true;
+            else
+                return false;
+        }
         void heightTests();
-        void getOverlapingRefs();
+        void getTraversableVoxels();
         
         void voxelize();
+        
+        
+        inline Span * getSpan(uint _x, uint _y)
+        {
+            uint X = m_volX;//num rows
+            uint Y = m_volZ;//number of elements inside the row
+            
+            if((_x < 0 || _x > (X-1))  ||  (_y < 0 || _y > (Y-1)))
+                return NULL;
+            else
+            {
+                uint i = _x*Y + _y;
+                return &m_spans[i];
+            }
+        }
+        void findSpanNeighbours();
     };
 };
 
