@@ -8,14 +8,16 @@ namespace deway
     {
     public:
         AABB * aabb;
-        bool overlaps; // flaged if overlaps anything
-        bool traversable;
-        bool blacklisted; //
+        bool overlaps; // flaged if overlaps any mesh, does mean its traversible
+        bool traversable; //traversible
+        bool blacklisted; //cannot be traversible
         
-//         union
-//         {
-//             Voxel * nghbr[26];
-//         };
+        bool edge;
+        
+        Voxel * nghbr[8];//neighbouring voxels
+        
+        float dist; //distance to the cosest edge voxel
+        
         Voxel();
         //Voxel(AABB _aabb = AABB());
         ~Voxel();

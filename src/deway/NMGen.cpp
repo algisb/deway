@@ -26,7 +26,7 @@ using namespace deway;
 }
 
 
-NMGen::NMGen(float * _vertexData, float * _normalData, uint _numVertex, uint _volX, uint _volY, uint _volZ, kep::Vector3 _offset, bool _autoSizeVolume, float _voxelSize,float _maxSlope, float _agentHeight)
+NMGen::NMGen(float * _vertexData, float * _normalData, uint _numVertex, uint _volX, uint _volY, uint _volZ, kep::Vector3 _offset, bool _autoSizeVolume, float _voxelSize,float _maxSlope, float _agentHeight, float _maxStepHeight)
 {
     float * dataV = _vertexData;
     float * dataN = _normalData;
@@ -56,11 +56,19 @@ NMGen::NMGen(float * _vertexData, float * _normalData, uint _numVertex, uint _vo
     m_numTravVoxels = 0;
     m_offset = _offset;
     m_maxSlope = _maxSlope;
-    m_numVoxel = m_volX * m_volY * m_volZ;
+    m_numVoxels = m_volX * m_volY * m_volZ;
     if(_autoSizeVolume)
         autoSizeVoxelVolume();
-    m_voxels = new Voxel[m_numVoxel];
+    m_voxels = new Voxel[m_numVoxels];
     m_agentHeight = _agentHeight;
+    m_maxStepHeight = _maxStepHeight;
+    m_numSpans = 0;
+    m_spans = NULL;
+    
+    m_numEdgeVoxels = 0;
+    m_edgeVoxels = NULL;
+    m_maxEdgeDist = 0.0f;
+
     
     
     genSpans();
@@ -69,9 +77,13 @@ NMGen::NMGen(float * _vertexData, float * _normalData, uint _numVertex, uint _vo
     
     voxelize();
     
-    findSpanNeighbours();
+    getSpanNeighbours();
+    getVoxelNeighbours();
     
-    getTraversableVoxels();
+    getTraversableVoxels();//fills m_travVoxels
+    getEdgeVoxels();//fills m_edgeVoxels
+    
+    calcEdgeDistances();
     
     
 }
@@ -138,7 +150,7 @@ void NMGen::autoSizeVoxelVolume()
             break;
         m_volZ++;
     }
-    m_numVoxel = m_volX * m_volY * m_volZ; 
+    m_numVoxels = m_volX * m_volY * m_volZ; 
     
 }
 
@@ -220,7 +232,7 @@ void NMGen::getTraversableVoxels()
     {
         uint iter = 0;
         m_travVoxels = new Voxel*[m_numTravVoxels];
-        for(uint i = 0; i<m_numVoxel; i++)
+        for(uint i = 0; i<m_numVoxels; i++)
         {
             if(m_voxels[i].traversable == true)
             {
@@ -232,6 +244,8 @@ void NMGen::getTraversableVoxels()
 }
 
 void NMGen::voxelize()
+
+
 {
     double singleExecTime = 0.0;
     EXEC_TIMER(singleExecTime,
@@ -239,11 +253,11 @@ void NMGen::voxelize()
     );
     printf("----Voxelizer info----\n");
     printf("Vox vol dimensions: %u %u %u\n", m_volX, m_volY, m_volZ);
-    printf("Num vox: %u \n", m_numVoxel);
+    printf("Num vox: %u \n", m_numVoxels);
     printf("Num tri: %u \n", m_numTriangles);
-    printf("Num test: %u \n", m_numVoxel*m_numTriangles);
+    printf("Num test: %u \n", m_numVoxels*m_numTriangles);
     printf("vox-tri time: %f \n", singleExecTime);
-    printf("Est worst-case vox time: %f \n", singleExecTime * m_numVoxel * m_numTriangles);
+    printf("Est worst-case vox time: %f \n", singleExecTime * m_numVoxels * m_numTriangles);
     
     double execTime = 0.0;
     EXEC_TIMER(execTime,
@@ -280,7 +294,7 @@ void NMGen::voxelize()
     heightTests();
 }
 
-void NMGen::findSpanNeighbours()
+void NMGen::getSpanNeighbours()
 {
     for(uint x = 0; x < m_volX; x++)
         for(uint y = 0; y < m_volZ; y++)
@@ -318,6 +332,101 @@ void NMGen::findSpanNeighbours()
 //         }
 //     }
 }
+
+
+bool NMGen::stepCheck(deway::Voxel* _v0, deway::Voxel* _v1)
+{
+    float step =  std::abs(_v0->aabb->c.y - _v1->aabb->c.y);
+    if(step > m_maxStepHeight)
+        return false;
+    else
+        return true;
+}
+
+void NMGen::getVoxelNeighbours()
+{
+    for(uint i = 0; i<m_numSpans; i++)
+    {
+        Span * span = &m_spans[i];
+        for(uint j = 0; j< span->m_size; j++)
+        {
+            Voxel * voxel = span->m_voxels[j];
+            
+            
+            if(voxel->traversable)//only care about traversable voxels
+                for(uint k = 0; k<8; k++)
+                {
+                    Span * spanN = span->nghbr[k]; //neighbour span
+                    if(spanN != NULL)//neighbour span exists
+                    {
+                        for(uint l = 0; l< spanN->m_size; l++)
+                        {
+                            Voxel * voxelN = spanN->m_voxels[l]; //potencial neighbour voxel
+                            if(voxelN->traversable && stepCheck(voxel, voxelN))
+                            {
+                                voxel->nghbr[k] = voxelN;
+                            }
+                            
+                        }
+                        
+                    }
+                }
+            
+            
+            
+            
+            
+        }
+        
+    }
+}
+
+void NMGen::getEdgeVoxels()
+{
+    for(uint i = 0; i<m_numVoxels; i++)
+        if(m_voxels[i].traversable == true)
+            for(uint j = 0; j<8; j++)
+                if(m_voxels[i].nghbr[j] == NULL)
+                {
+                    m_voxels[i].edge = true;
+                    m_numEdgeVoxels++;
+                    break;
+                }
+                
+    m_edgeVoxels = new Voxel*[m_numEdgeVoxels];
+    
+    uint iter = 0;
+    for(uint i = 0; i<m_numVoxels; i++)
+        if(m_voxels[i].edge)
+        {
+            m_edgeVoxels[iter] = &m_voxels[i];
+            iter++;
+        }
+}
+
+void NMGen::calcEdgeDistances()
+{
+    if(m_numTravVoxels > 0 && m_numEdgeVoxels > 0)
+    for(uint i = 0; i<m_numTravVoxels; i++)
+    {
+        if(m_travVoxels[i]->edge)
+        {
+            m_travVoxels[i]->dist = 0.0f;
+            continue;
+        }
+        m_travVoxels[i]->dist = (m_travVoxels[i]->aabb->c - m_edgeVoxels[0]->aabb->c).magnitude();
+        if(m_travVoxels[i]->dist > m_maxEdgeDist)
+            m_maxEdgeDist = m_travVoxels[i]->dist;
+        
+        for(uint j = 0; j<m_numEdgeVoxels; j++)
+        {
+            float dist = (m_travVoxels[i]->aabb->c - m_edgeVoxels[j]->aabb->c).magnitude();
+            if(dist < m_travVoxels[i]->dist)
+                m_travVoxels[i]->dist = dist;
+        }
+    }
+}
+
 
 
 

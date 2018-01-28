@@ -8,6 +8,10 @@ Voxel::Voxel()
     //overlaps = false;
     traversable = false;
     blacklisted = false;
+    for(uint i = 0; i<8; i++)
+        nghbr[i] = NULL;
+    edge = false;
+    dist = 0.0f;
 }
 Voxel::~Voxel()
 {

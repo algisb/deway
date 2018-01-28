@@ -68,7 +68,8 @@ World_0::World_0(Core * _core) : World(_core)
         true, //auto size the volume
         0.2f, //voxel size
         0.8f, //max slope incline
-        2.0f //agent height
+        2.0f, //agent height
+        0.5f //max step height
         );
     
     
@@ -98,11 +99,30 @@ World_0::World_0(Core * _core) : World(_core)
                                         ));
     refEntity->addComponent(new Render(m_core->m_voxelVolumeOutlineMesh, m_core->m_shaderMinimal, NULL, RenderMode::WIRE));
     
-    //TEST VOLUME VISUALIZATION
+    
     for(int i = 0; i<nmgen.m_numTravVoxels; i++)
     {
-        m_core->m_voxelVolumeMesh->addTopQuad(nmgen.m_travVoxels[i]->aabb->c, nmgen.m_travVoxels[i]->aabb->hs);
+        refEntity = new Entity(this, "quad");
+        refTransform = (Transform*)refEntity->addComponent(new Transform(
+                                            kep::Vector3(nmgen.m_travVoxels[i]->aabb->c.x, nmgen.m_travVoxels[i]->aabb->c.y + nmgen.m_voxelSize, nmgen.m_travVoxels[i]->aabb->c.z),
+                                            kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
+                                            kep::Vector3(nmgen.m_voxelSize, nmgen.m_voxelSize, nmgen.m_voxelSize)
+                                            ));
+        float shade = nmgen.m_travVoxels[i]->dist/nmgen.m_maxEdgeDist;
+        refEntity->addComponent(new Render(m_core->m_plane, m_core->m_shaderMinimal ,NULL, RenderMode::SOLID, kep::Vector3(shade, shade, shade)));
     }
+    
+    
+    //TEST VOLUME VISUALIZATION///////////////////////////////////////////////////////////////////
+//     for(int i = 0; i<nmgen.m_numTravVoxels; i++)
+//     {
+//         m_core->m_voxelVolumeMesh->addTopQuad(nmgen.m_travVoxels[i]->aabb->c, nmgen.m_travVoxels[i]->aabb->hs);
+//     }
+    
+//     for(int i = 0; i<nmgen.m_numEdgeVoxels; i++)
+//     {
+//         m_core->m_voxelVolumeMesh->addTopQuad(nmgen.m_edgeVoxels[i]->aabb->c, nmgen.m_edgeVoxels[i]->aabb->hs);
+//     }
     
 //     for(int i = 0; i<nmgen.m_numVoxel; i++)
 //     {
@@ -114,15 +134,15 @@ World_0::World_0(Core * _core) : World(_core)
 //         m_core->m_voxelVolumeMesh->addBox(nmgen.m_spans[0].m_voxels[i]->aabb.c, nmgen.m_spans[0].m_voxels[i]->aabb.hs);
 //     }
     
-    m_core->m_voxelVolumeMesh->gen();
-    
-    refEntity = new Entity(this, "voxel volume");
-    refTransform = (Transform*)refEntity->addComponent(new Transform(
-                                        kep::Vector3(0.0f, 0.0f, 0.0f),
-                                        kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
-                                        kep::Vector3(1.0f, 1.0f, 1.0f)
-                                        ));
-    refEntity->addComponent(new Render(m_core->m_voxelVolumeMesh, m_core->m_shaderMinimal, NULL, RenderMode::WIRE));
+//     m_core->m_voxelVolumeMesh->gen();
+//     
+//     refEntity = new Entity(this, "voxel volume");
+//     refTransform = (Transform*)refEntity->addComponent(new Transform(
+//                                         kep::Vector3(0.0f, 0.0f, 0.0f),
+//                                         kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
+//                                         kep::Vector3(1.0f, 1.0f, 1.0f)
+//                                         ));
+//     refEntity->addComponent(new Render(m_core->m_voxelVolumeMesh, m_core->m_shaderMinimal, NULL, RenderMode::WIRE));
     
     ///////////////////////////////////////////////////////////////////////////////////////////////
     

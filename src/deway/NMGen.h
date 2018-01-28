@@ -19,7 +19,7 @@ namespace deway
         
         float m_voxelSize;//this is a HALF-LENGTH
         float m_maxSlope;
-        uint m_numVoxel;
+        uint m_numVoxels;
         Voxel * m_voxels;
         
         uint m_numTravVoxels;
@@ -30,9 +30,16 @@ namespace deway
         Span * m_spans;
         
         float m_agentHeight;
+        float m_maxStepHeight;
+        
+        /////////
+        uint m_numEdgeVoxels;
+        Voxel ** m_edgeVoxels;
+        float m_maxEdgeDist;
         
         
-        NMGen(float * _vertexData, float * _normalData, uint _numVertex, uint _volX, uint _volY, uint _volZ, kep::Vector3 _offset, bool _autoSizeVolume, float _voxelSize,float _maxSlope, float _agentHeight);
+        
+        NMGen(float * _vertexData, float * _normalData, uint _numVertex, uint _volX, uint _volY, uint _volZ, kep::Vector3 _offset, bool _autoSizeVolume, float _voxelSize,float _maxSlope, float _agentHeight, float _maxStepHeight);
         ~NMGen();
         
         void genSpans();
@@ -66,7 +73,12 @@ namespace deway
                 return &m_spans[i];
             }
         }
-        void findSpanNeighbours();
+        void getSpanNeighbours();
+        bool stepCheck(Voxel * _v0, Voxel * _v1);
+
+        void getVoxelNeighbours();
+        void getEdgeVoxels();
+        void calcEdgeDistances();
     };
 };
 
