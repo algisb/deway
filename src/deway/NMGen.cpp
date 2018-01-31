@@ -1,6 +1,7 @@
 #include "NMGen.h"
 #include <chrono>
 #include "AABB.h"
+#include "RegGen.h"
 using namespace deway;
 #define EXEC_TIMER(o_timeElapsed, _expr) \
 {\
@@ -68,6 +69,7 @@ NMGen::NMGen(float * _vertexData, float * _normalData, uint _numVertex, uint _vo
     m_numEdgeVoxels = 0;
     m_edgeVoxels = NULL;
     m_maxEdgeDist = 0.0f;
+    m_regGen = NULL;
 
     
     
@@ -84,6 +86,7 @@ NMGen::NMGen(float * _vertexData, float * _normalData, uint _numVertex, uint _vo
     getEdgeVoxels();//fills m_edgeVoxels
     
     calcEdgeDistances();
+    genRegions();
     
     
 }
@@ -92,6 +95,7 @@ NMGen::~NMGen()
     delete[] m_triangles;
     delete[] m_travVoxels;
     delete[] m_spans;
+    delete m_regGen;
 }
 
 void NMGen::genSpans()
@@ -244,8 +248,6 @@ void NMGen::getTraversableVoxels()
 }
 
 void NMGen::voxelize()
-
-
 {
     double singleExecTime = 0.0;
     EXEC_TIMER(singleExecTime,
@@ -406,26 +408,37 @@ void NMGen::getEdgeVoxels()
 
 void NMGen::calcEdgeDistances()
 {
+    //calculates edge distance for each voxel
     if(m_numTravVoxels > 0 && m_numEdgeVoxels > 0)
-    for(uint i = 0; i<m_numTravVoxels; i++)
-    {
-        if(m_travVoxels[i]->edge)
+        for(uint i = 0; i<m_numTravVoxels; i++)
         {
-            m_travVoxels[i]->dist = 0.0f;
-            continue;
+            if(m_travVoxels[i]->edge)
+            {
+                m_travVoxels[i]->dist = 0.0f;
+                continue;
+            }
+            m_travVoxels[i]->dist = (m_travVoxels[i]->aabb->c - m_edgeVoxels[0]->aabb->c).magnitude();
+            
+            for(uint j = 0; j<m_numEdgeVoxels; j++)
+            {
+                float dist = (m_travVoxels[i]->aabb->c - m_edgeVoxels[j]->aabb->c).magnitude();
+                if(dist < m_travVoxels[i]->dist)
+                    m_travVoxels[i]->dist = dist;
+            }
         }
-        m_travVoxels[i]->dist = (m_travVoxels[i]->aabb->c - m_edgeVoxels[0]->aabb->c).magnitude();
+    
+    //finds max edge distance
+    for(uint i = 0; i<m_numTravVoxels; i++)
         if(m_travVoxels[i]->dist > m_maxEdgeDist)
             m_maxEdgeDist = m_travVoxels[i]->dist;
-        
-        for(uint j = 0; j<m_numEdgeVoxels; j++)
-        {
-            float dist = (m_travVoxels[i]->aabb->c - m_edgeVoxels[j]->aabb->c).magnitude();
-            if(dist < m_travVoxels[i]->dist)
-                m_travVoxels[i]->dist = dist;
-        }
-    }
 }
+
+void NMGen::genRegions()
+{
+    m_regGen = new RegGen(m_travVoxels, m_numTravVoxels, m_maxEdgeDist);
+    printf("m_maxEdgeDist: %f \n", m_maxEdgeDist);
+}
+
 
 
 

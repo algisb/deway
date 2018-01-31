@@ -5,9 +5,11 @@
 #include "Voxel.h"
 #include "typedefs.h"
 
+
+
 namespace deway
 { 
-
+    class RegGen;
     class NMGen
     {
     public:
@@ -36,6 +38,9 @@ namespace deway
         uint m_numEdgeVoxels;
         Voxel ** m_edgeVoxels;
         float m_maxEdgeDist;
+        
+        RegGen * m_regGen; //region generator
+        
         
         
         
@@ -79,6 +84,7 @@ namespace deway
         void getVoxelNeighbours();
         void getEdgeVoxels();
         void calcEdgeDistances();
+        void genRegions();
     };
 };
 

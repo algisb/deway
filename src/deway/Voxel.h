@@ -4,6 +4,7 @@
 namespace deway 
 {
     class AABB;
+    class Region;
     class Voxel
     {
     public:
@@ -17,6 +18,10 @@ namespace deway
         Voxel * nghbr[8];//neighbouring voxels
         
         float dist; //distance to the cosest edge voxel
+        
+        //Region generation
+        Region * reg;//region voxel belongs to currently
+        Region * regLast;//region the voxel belonged to before expansion
         
         Voxel();
         //Voxel(AABB _aabb = AABB());

@@ -69,7 +69,7 @@ World_0::World_0(Core * _core) : World(_core)
         0.2f, //voxel size
         0.8f, //max slope incline
         2.0f, //agent height
-        0.5f //max step height
+        0.5f//max step height
         );
     
     
@@ -98,6 +98,20 @@ World_0::World_0(Core * _core) : World(_core)
                                         kep::Vector3(1.0f, 1.0f, 1.0f)
                                         ));
     refEntity->addComponent(new Render(m_core->m_voxelVolumeOutlineMesh, m_core->m_shaderMinimal, NULL, RenderMode::WIRE));
+    
+//     for(int i = 0; i<nmgen.m_regions[0]->m_numVoxels; i++)
+//     {
+//         
+//         refEntity = new Entity(this, "quad");
+//         refTransform = (Transform*)refEntity->addComponent(new Transform(
+//                                             kep::Vector3(nmgen.m_regions[0]->m_voxels[i]->aabb->c.x, nmgen.m_regions[0]->m_voxels[i]->aabb->c.y + nmgen.m_voxelSize, nmgen.m_regions[0]->m_voxels[i]->aabb->c.z),
+//                                             kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
+//                                             kep::Vector3(nmgen.m_voxelSize, nmgen.m_voxelSize, nmgen.m_voxelSize)
+//                                             ));
+//         float shade = nmgen.m_regions[0]->m_voxels[i]->dist/nmgen.m_maxEdgeDist;
+//         refEntity->addComponent(new Render(m_core->m_plane, m_core->m_shaderMinimal ,NULL, RenderMode::SOLID, kep::Vector3(shade, shade, shade)));
+//     }
+    
     
     
     for(int i = 0; i<nmgen.m_numTravVoxels; i++)

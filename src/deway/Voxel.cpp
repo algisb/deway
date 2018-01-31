@@ -12,6 +12,8 @@ Voxel::Voxel()
         nghbr[i] = NULL;
     edge = false;
     dist = 0.0f;
+    reg = NULL;
+    regLast = NULL;
 }
 Voxel::~Voxel()
 {
