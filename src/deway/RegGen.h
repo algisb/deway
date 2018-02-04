@@ -14,12 +14,16 @@ namespace deway
         uint m_numTravVoxels;
         float m_maxEdgeDist;
         
+        
         RegGen(Voxel ** _travVoxels, uint _numTravVoxels, float _maxEdgeDist);
         ~RegGen();
         
-        void expand();
+        int sortRegs(std::vector<Region*> * _regions);
+        int transferVoxels(Region * _from, Region * _to);
+        
         void create();
         void merge();
+        
     };
 };
 

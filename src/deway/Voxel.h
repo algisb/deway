@@ -21,7 +21,7 @@ namespace deway
         
         //Region generation
         Region * reg;//region voxel belongs to currently
-        Region * regLast;//region the voxel belonged to before expansion
+        int regCounter;
         
         Voxel();
         //Voxel(AABB _aabb = AABB());

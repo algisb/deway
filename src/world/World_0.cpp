@@ -11,6 +11,9 @@
 #include "kep/collisionDetection/finephase/MeshCollider.h"
 #include "deway/NMGen.h"
 #include "deway/AABB.h"
+#include <deway/RegGen.h>
+#include <time.h>
+
 
 using namespace kelp;
 
@@ -69,7 +72,7 @@ World_0::World_0(Core * _core) : World(_core)
         0.2f, //voxel size
         0.8f, //max slope incline
         2.0f, //agent height
-        0.5f//max step height
+        1.0f//max step height
         );
     
     
@@ -99,35 +102,70 @@ World_0::World_0(Core * _core) : World(_core)
                                         ));
     refEntity->addComponent(new Render(m_core->m_voxelVolumeOutlineMesh, m_core->m_shaderMinimal, NULL, RenderMode::WIRE));
     
-//     for(int i = 0; i<nmgen.m_regions[0]->m_numVoxels; i++)
+//     srand(time(NULL));
+//     int rID = rand() % nmgen.m_numTravVoxels;
+//     printf("rID: %u \n", rID-1);
+//     
+//     refEntity = new Entity(this, "quad");
+//     refTransform = (Transform*)refEntity->addComponent(new Transform(
+//                                         kep::Vector3(nmgen.m_travVoxels[rID]->aabb->c.x, nmgen.m_travVoxels[rID]->aabb->c.y + nmgen.m_voxelSize, nmgen.m_travVoxels[rID]->aabb->c.z),
+//                                         kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
+//                                         kep::Vector3(nmgen.m_voxelSize, nmgen.m_voxelSize, nmgen.m_voxelSize)
+//                                         ));
+//     refEntity->addComponent(new Render(m_core->m_plane, m_core->m_shaderMinimal ,NULL, RenderMode::SOLID, kep::Vector3(0.0f, 0.0f, 0.0f)));
+//     for(int i = 0; i<8; i=i+2)
 //     {
-//         
 //         refEntity = new Entity(this, "quad");
 //         refTransform = (Transform*)refEntity->addComponent(new Transform(
-//                                             kep::Vector3(nmgen.m_regions[0]->m_voxels[i]->aabb->c.x, nmgen.m_regions[0]->m_voxels[i]->aabb->c.y + nmgen.m_voxelSize, nmgen.m_regions[0]->m_voxels[i]->aabb->c.z),
+//                                             kep::Vector3(nmgen.m_travVoxels[rID]->nghbr[i]->aabb->c.x, nmgen.m_travVoxels[rID]->nghbr[i]->aabb->c.y + nmgen.m_voxelSize, nmgen.m_travVoxels[rID]->nghbr[i]->aabb->c.z),
 //                                             kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
 //                                             kep::Vector3(nmgen.m_voxelSize, nmgen.m_voxelSize, nmgen.m_voxelSize)
 //                                             ));
-//         float shade = nmgen.m_regions[0]->m_voxels[i]->dist/nmgen.m_maxEdgeDist;
-//         refEntity->addComponent(new Render(m_core->m_plane, m_core->m_shaderMinimal ,NULL, RenderMode::SOLID, kep::Vector3(shade, shade, shade)));
+//         refEntity->addComponent(new Render(m_core->m_plane, m_core->m_shaderMinimal ,NULL, RenderMode::SOLID, kep::Vector3(1.0f, 0.0f, 0.0f)));
 //     }
     
     
     
-    for(int i = 0; i<nmgen.m_numTravVoxels; i++)
+    //REGION VISUALIZATION
+    srand(time(NULL));
+    for(uint regID = 0; regID<nmgen.m_regGen->m_regions.size(); regID++)
     {
-        refEntity = new Entity(this, "quad");
-        refTransform = (Transform*)refEntity->addComponent(new Transform(
-                                            kep::Vector3(nmgen.m_travVoxels[i]->aabb->c.x, nmgen.m_travVoxels[i]->aabb->c.y + nmgen.m_voxelSize, nmgen.m_travVoxels[i]->aabb->c.z),
-                                            kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
-                                            kep::Vector3(nmgen.m_voxelSize, nmgen.m_voxelSize, nmgen.m_voxelSize)
-                                            ));
-        float shade = nmgen.m_travVoxels[i]->dist/nmgen.m_maxEdgeDist;
-        refEntity->addComponent(new Render(m_core->m_plane, m_core->m_shaderMinimal ,NULL, RenderMode::SOLID, kep::Vector3(shade, shade, shade)));
+        
+        int r0 = rand() % 100;
+        int r1 = rand() % 100;
+        int r2 = rand() % 100;
+        //printf("rand n: %f \n", (float)r/100.0f);
+        
+        kep::Vector3 col = kep::Vector3((float)r0/100.0f, (float)r1/100.0f, (float)r2/100.0f);
+        for(uint i = 0; i<nmgen.m_regGen->m_regions[regID]->m_voxels.size(); i++)
+        {
+            
+            refEntity = new Entity(this, "quad");
+            refTransform = (Transform*)refEntity->addComponent(new Transform(
+                                                kep::Vector3(nmgen.m_regGen->m_regions[regID]->m_voxels[i]->aabb->c.x, nmgen.m_regGen->m_regions[regID]->m_voxels[i]->aabb->c.y + nmgen.m_voxelSize, nmgen.m_regGen->m_regions[regID]->m_voxels[i]->aabb->c.z),
+                                                kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
+                                                kep::Vector3(nmgen.m_voxelSize, nmgen.m_voxelSize, nmgen.m_voxelSize)
+                                                ));
+            refEntity->addComponent(new Render(m_core->m_plane, m_core->m_shaderMinimal ,NULL, RenderMode::SOLID, col));
+        }
     }
     
     
-    //TEST VOLUME VISUALIZATION///////////////////////////////////////////////////////////////////
+    
+//     for(int i = 0; i<nmgen.m_numTravVoxels; i++)
+//     {
+//         refEntity = new Entity(this, "quad");
+//         refTransform = (Transform*)refEntity->addComponent(new Transform(
+//                                             kep::Vector3(nmgen.m_travVoxels[i]->aabb->c.x, nmgen.m_travVoxels[i]->aabb->c.y + nmgen.m_voxelSize, nmgen.m_travVoxels[i]->aabb->c.z),
+//                                             kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
+//                                             kep::Vector3(nmgen.m_voxelSize, nmgen.m_voxelSize, nmgen.m_voxelSize)
+//                                             ));
+//         float shade = nmgen.m_travVoxels[i]->dist/nmgen.m_maxEdgeDist;
+//         refEntity->addComponent(new Render(m_core->m_plane, m_core->m_shaderMinimal ,NULL, RenderMode::SOLID, kep::Vector3(shade, shade, shade)));
+//     }
+    
+    
+    //TEST VOLUME VISUALIZATION USING LINES///////////////////////////////////////////////////////////////////
 //     for(int i = 0; i<nmgen.m_numTravVoxels; i++)
 //     {
 //         m_core->m_voxelVolumeMesh->addTopQuad(nmgen.m_travVoxels[i]->aabb->c, nmgen.m_travVoxels[i]->aabb->hs);

@@ -13,7 +13,7 @@ Voxel::Voxel()
     edge = false;
     dist = 0.0f;
     reg = NULL;
-    regLast = NULL;
+    regCounter = 0;
 }
 Voxel::~Voxel()
 {
