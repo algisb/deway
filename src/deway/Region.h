@@ -12,6 +12,7 @@ namespace deway
         Region();
         ~Region();
         int addVoxelRef(Voxel * _v);
+        uint size();
         
         
     };

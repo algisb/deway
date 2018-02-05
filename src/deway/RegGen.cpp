@@ -50,7 +50,10 @@ int RegGen::sortRegs(std::vector<Region *> * _regions)
 int RegGen::transferVoxels(Region* _from, Region* _to)
 {
     for(uint i = 0; i < _from->m_voxels.size(); i++)
+    {
+            _from->m_voxels[i]->reg = _to;
             _to->addVoxelRef(_from->m_voxels[i]);
+    }
     return 0;
 }
 
@@ -58,7 +61,7 @@ int RegGen::transferVoxels(Region* _from, Region* _to)
 void RegGen::create()
 {
     //CONFIGS
-    float ccD = 10.0f;//the smaller the number the harder it is for new regions to form
+    float ccD = 10.0f;//10.0f; best value //the smaller the number the harder it is for new regions to form
     float lastLevel = 0.0f;//4.0f;
     float raiseLevel = 0.01f;
     ///////////////////////////////////
@@ -83,7 +86,12 @@ void RegGen::create()
                     {
                         if(m_travVoxelsRef[i]->nghbr[j]->reg != NULL)//neighbour is part of a region
                         {
-                            m_travVoxelsRef[i]->reg = m_travVoxelsRef[i]->nghbr[j]->reg;
+                            if(m_travVoxelsRef[i]->reg == NULL)
+                                m_travVoxelsRef[i]->reg = m_travVoxelsRef[i]->nghbr[j]->reg;
+                            else
+                                if(m_travVoxelsRef[i]->reg->m_voxels.size() < m_travVoxelsRef[i]->nghbr[j]->reg->m_voxels.size())
+                                    m_travVoxelsRef[i]->reg = m_travVoxelsRef[i]->nghbr[j]->reg;
+                                
                             break;
                         }
                     }
@@ -118,67 +126,48 @@ void RegGen::create()
 void RegGen::merge()
 {
     //CONFIGS
-    uint minRegionSize = 100;//CONFIGURATION PARAMETER
+    uint minRegionSize = 200;//CONFIGURATION PARAMETER
     //////////////////////
-    
-    //collect small regions
-    std::vector<Region*> smallRegions;
-    for(uint i = 0; i < m_regions.size(); i++)
-        if(m_regions[i]->m_voxels.size() < minRegionSize)
-            smallRegions.push_back(m_regions[i]);
-        
-    sortRegs(&smallRegions);
-//     for(uint i = 0; i < smallRegions.size(); i++)
-//     {
-//         printf("reg size: %zu \n", smallRegions[i]->m_voxels.size());
-//     }
-    
-    //respective regions to which the small regions will be merged
-    Region ** mergeRegions = new Region*[smallRegions.size()];
-    for(uint i = 0; i < smallRegions.size(); i++)
-        mergeRegions[i] = NULL;
-        
+
     
     //find merge regions
-    for(uint i = 0; i < smallRegions.size(); i++)
+    uint i = 0;
+    while(i < m_regions.size())//for each region
     {
-        bool mergeRegFound = false;
-        for(uint j = 0; j < smallRegions[i]->m_voxels.size(); j++)
+        
+        
+        printf("iter: %u \n", i);
+        
+        
+        if(m_regions[i]->size() < minRegionSize)//region smaller than specified, meaning needs to be merged or deleted
         {
-            Voxel * v = smallRegions[i]->m_voxels[j];
-            for(uint k = 0; k<8; k++)
-                if(v->nghbr[k] != NULL)
-                    if(v->nghbr[k]->reg != NULL)
-                        if(v->nghbr[k]->reg->m_voxels.size() > minRegionSize)
-                        {
-                            mergeRegions[i] = v->nghbr[k]->reg;
-                            mergeRegFound = true;
-                            break;
-                        }
-                
-            if(mergeRegFound)
-            break;
+            //attempt merging the region
+            bool merged = false;
+            Region * r = m_regions[i];
+            for(uint j = 0; j<m_regions[i]->size(); j++)//for each voxel in the region
+            {
+                Voxel * v = r->m_voxels[j];
+                for(uint k = 0; k<8; k++)//for each neighbour voxel
+                {
+                    Voxel * n = v->nghbr[k];
+                    if( n != NULL)
+                        if(n->reg != NULL)
+                            if(n->reg != v->reg)
+                            {
+                                transferVoxels(v->reg, n->reg);
+                                merged = true;
+                                break;
+                            }
+                }
+                if(merged)
+                    break;
+            }
+            //delete the region
+            delete m_regions[i];
+            m_regions.erase(m_regions.begin() + i);
+            continue;
         }
+        i++;
     }
     
-    
-    //add voxels from small regions to the larger ones
-    for(uint i = 0; i < smallRegions.size(); i++)
-        if(mergeRegions[i] != NULL)
-            for(uint j = 0; j < smallRegions[i]->m_voxels.size(); j++)
-                mergeRegions[i]->addVoxelRef(smallRegions[i]->m_voxels[j]);
-    
-    //delete the small regions
-    //printf("num small: %u \n", smallRegions.size());
-    for(uint i = 0; i < smallRegions.size(); i++)
-        for(uint j = 0; j< m_regions.size(); j++)
-            if(smallRegions[i] == m_regions[j])
-            {
-                //printf("eq\n");
-                delete m_regions[j];
-                m_regions.erase(m_regions.begin()+j);
-            }
-    
-    
-    delete [] mergeRegions;
 }
