@@ -23,6 +23,9 @@ namespace deway
         
         void create();
         void merge();
+        void countBoardRegs(std::vector<std::vector<Region*>> & _vvr, Voxel * _n);
+        void filterWrappingCorners();
+        
         
     };
 };

@@ -14,6 +14,7 @@ RegGen::RegGen(Voxel ** _travVoxels, uint _numTravVoxels, float _maxEdgeDist)
 
     create();
     merge();
+    filterWrappingCorners();
     
 }
 RegGen::~RegGen()
@@ -136,7 +137,7 @@ void RegGen::merge()
     {
         
         
-        printf("iter: %u \n", i);
+        //printf("iter: %u \n", i);
         
         
         if(m_regions[i]->size() < minRegionSize)//region smaller than specified, meaning needs to be merged or deleted
@@ -171,3 +172,78 @@ void RegGen::merge()
     }
     
 }
+
+
+void RegGen::countBoardRegs(std::vector<std::vector<Region*>> & _vvr, Voxel * _n)
+{
+    bool ext = false;
+    for(uint i = 0; i<_vvr.size(); i++)
+    {
+        if(_vvr[i].size() > 0)
+            if(_vvr[i][0] == _n->reg)
+            {
+                _vvr[i].push_back(_n->reg);
+                ext = true;
+            }
+    }
+    
+    if(!ext)
+    {
+        std::vector<Region*> vr;
+        vr.push_back(_n->reg);
+        _vvr.push_back(vr);
+    }
+}
+
+void RegGen::filterWrappingCorners()
+{
+    uint numFilter = 2; //CONFIG PARAMETER
+    ///////////////////////////////////////
+    //scan all voxels and assgin then to region which it has more connections to
+    for(uint nk = 0; nk <numFilter; nk ++)
+        for(uint i = 0; i<m_regions.size(); i++)
+        {
+            Region * r = m_regions[i];
+            for(uint j = 0; j < r->size(); j++)
+            {
+                Voxel * v = r->m_voxels[j];
+                std::vector<std::vector<Region*>> vvr;
+                for(uint k = 0; k<8; k++)
+                {
+                    Voxel * n = v->nghbr[k];
+                    if(n != NULL)
+                        countBoardRegs(vvr, n);
+                }
+                std::vector<Region*> * pvr = NULL;
+                for(uint k = 0; k<vvr.size(); k++)
+                {
+                    if(pvr != NULL)
+                    {
+                        if(vvr[k].size() > pvr->size())
+                            pvr = &vvr[k];
+                    }
+                    else
+                    {
+                        pvr = &vvr[k];
+                    }
+                }
+                
+                Region * nr = (*pvr)[0];
+                if(v->reg != nr)//move the voxel to the new region
+                {
+                    v->reg = nr;
+                    r->m_voxels.erase(r->m_voxels.begin() + j);
+                    nr->m_voxels.push_back(v);
+                    j--;
+                }
+                
+                
+            }
+        }
+    
+    
+}
+
+
+
+
