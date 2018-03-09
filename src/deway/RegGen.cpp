@@ -62,7 +62,7 @@ int RegGen::transferVoxels(Region* _from, Region* _to)
 void RegGen::create()
 {
     //CONFIGS
-    float ccD = 10.0f;//10.0f; best value //the smaller the number the harder it is for new regions to form
+    float ccD = 20.0f;//10.0f; best value //the smaller the number the harder it is for new regions to form
     float lastLevel = 0.0f;//4.0f;
     float raiseLevel = 0.01f;
     ///////////////////////////////////

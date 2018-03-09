@@ -14,6 +14,9 @@ Voxel::Voxel()
     dist = 0.0f;
     reg = NULL;
     regCounter = 0;
+    
+    for(uint i = 0; i<4; i++)
+        edg[i] = NULL;
 }
 Voxel::~Voxel()
 {

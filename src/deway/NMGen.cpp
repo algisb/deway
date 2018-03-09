@@ -2,6 +2,7 @@
 #include <chrono>
 #include "AABB.h"
 #include "RegGen.h"
+#include "ContGen.h"
 using namespace deway;
 #define EXEC_TIMER(o_timeElapsed, _expr) \
 {\
@@ -68,8 +69,9 @@ NMGen::NMGen(float * _vertexData, float * _normalData, uint _numVertex, uint _vo
     
     m_numEdgeVoxels = 0;
     m_edgeVoxels = NULL;
-    m_maxEdgeDist = 0.0f;
+    m_maxEdgeDist = 0.0f; //maximum value inside the distance field
     m_regGen = NULL;
+    m_contGen = NULL;
 
     
     
@@ -87,6 +89,7 @@ NMGen::NMGen(float * _vertexData, float * _normalData, uint _numVertex, uint _vo
     
     calcEdgeDistances();
     genRegions();
+    genContours();
     
     
 }
@@ -96,6 +99,7 @@ NMGen::~NMGen()
     delete[] m_travVoxels;
     delete[] m_spans;
     delete m_regGen;
+    delete m_contGen;
 }
 
 void NMGen::genSpans()
@@ -438,6 +442,14 @@ void NMGen::genRegions()
     m_regGen = new RegGen(m_travVoxels, m_numTravVoxels, m_maxEdgeDist);
     printf("m_maxEdgeDist: %f \n", m_maxEdgeDist);
 }
+
+void NMGen::genContours()
+{
+    m_contGen = new ContGen(&m_regGen->m_regions);
+}
+
+
+
 
 
 

@@ -9,6 +9,7 @@
 
 namespace deway
 { 
+    class ContGen;
     class RegGen;
     class NMGen
     {
@@ -40,7 +41,7 @@ namespace deway
         float m_maxEdgeDist;
         
         RegGen * m_regGen; //region generator
-        
+        ContGen * m_contGen; //contour generator
         
         
         
@@ -85,6 +86,7 @@ namespace deway
         void getEdgeVoxels();
         void calcEdgeDistances();
         void genRegions();
+        void genContours();
     };
 };
 
