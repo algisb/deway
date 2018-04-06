@@ -3,12 +3,14 @@
 #include "Edge.h"
 #include "Voxel.h"
 #include "AABB.h"
+#include "Contour.h"
 using namespace deway;
 ContGen::ContGen(std::vector<Region*> * _regions)
 {
     m_regions_ref = _regions;
     genEdges();
     flagExtEdges();
+    genContours();
 }
 
 ContGen::~ContGen()
@@ -125,6 +127,38 @@ void ContGen::flagExtEdges()
              if(m_edge[i]->nghbr[0]->reg != m_edge[i]->nghbr[1]->reg)
                  m_edge[i]->external = true;
     }
+}
+
+void ContGen::genContours()
+{
+    for(uint i = 0; i<m_regions_ref->size(); i++)
+    {
+        deway::Region & rr = (*(*m_regions_ref)[i]);
+        Contour * con = new Contour();
+        Edge * initEdge = NULL;
+        
+        
+        //find the first external edge
+        for(uint j = 0; j< rr.size(); j++)
+        {
+            for(uint k = 0; k<4; k++)
+            {
+                if(rr.m_voxels[j]->edg[k]->external)
+                    initEdge = rr.m_voxels[j]->edg[k];
+                
+                if(initEdge != NULL)
+                    break;
+            }
+            if(initEdge != NULL)
+                    break;
+        }
+        
+        
+        
+        
+        
+    }
+
 }
 
 
