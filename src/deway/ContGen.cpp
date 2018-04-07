@@ -10,7 +10,7 @@ ContGen::ContGen(std::vector<Region*> * _regions)
     m_regions_ref = _regions;
     genEdges();
     flagExtEdges();
-    genContours();
+    traceContours();
 }
 
 ContGen::~ContGen()
@@ -129,14 +129,16 @@ void ContGen::flagExtEdges()
     }
 }
 
-void ContGen::genContours()
+void ContGen::traceContours()
 {
     for(uint i = 0; i<m_regions_ref->size(); i++)
     {
         deway::Region & rr = (*(*m_regions_ref)[i]);
         Contour * con = new Contour();
-        Edge * initEdge = NULL;
         
+        Edge * initEdge = NULL;
+        Voxel * initVoxel = NULL;
+        int direction = 0;
         
         //find the first external edge
         for(uint j = 0; j< rr.size(); j++)
@@ -144,7 +146,10 @@ void ContGen::genContours()
             for(uint k = 0; k<4; k++)
             {
                 if(rr.m_voxels[j]->edg[k]->external)
+                {
                     initEdge = rr.m_voxels[j]->edg[k];
+                    initVoxel = rr.m_voxels[j];
+                }
                 
                 if(initEdge != NULL)
                     break;
@@ -153,10 +158,65 @@ void ContGen::genContours()
                     break;
         }
         
+        //find the initial direction of the tracer
+        for(uint j = 0; j<4; j++)
+        {
+            if(initVoxel->edg[j] == initEdge)
+            {
+                direction = j;
+                break;
+            }
+        }
+        //printf("dir: %d \n", direction);
+        con->m_contour.push_back(initEdge);//add initial edge to the contour
         
         
         
         
+        //START of the tracing algorithm////////////////////////////////////////////
+        Edge * currentEdge = initEdge;
+        Voxel * currentVoxel = initVoxel;
+        bool cw = true; // clockwise
+        
+        while(1)
+        {
+            //rotate the tracer
+            if(cw)
+            {
+                direction++;
+                if(direction > 3)
+                    direction = 0;
+            }
+            else
+            {
+                direction--;
+                if(direction < 0)
+                    direction = 3;
+            }
+            
+            currentEdge = currentVoxel->edg[direction];
+            if(currentEdge->external)
+            {
+                cw = true;//set next rotation dir
+                if(currentEdge == initEdge)//check if the tracing is complete
+                    break;
+                else
+                    con->m_contour.push_back(initEdge);//add edge to the contour
+            }
+            else
+            {
+                cw = false;//set next rotation dir
+                //move on to the neighbour voxel
+                if(currentEdge->nghbr[0] != currentVoxel)//should not need to check for NULL neighbour as these are internal edges
+                    currentVoxel = currentEdge->nghbr[0];
+                else
+                    currentVoxel = currentEdge->nghbr[1];
+            }
+        }
+        /////////////////////////////////////////////////////////////////////////////
+        printf("num edg: %d \n", con->m_contour.size());
+        
+        m_contours.push_back(con);//add the contour to the list of contours
     }
 
 }

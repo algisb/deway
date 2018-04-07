@@ -17,7 +17,7 @@ namespace deway
         ~ContGen();
         void genEdges();
         void flagExtEdges();
-        void genContours();
+        void traceContours();
     };
 };
 #endif
