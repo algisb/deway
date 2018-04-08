@@ -42,8 +42,8 @@ void ContGen::genEdges()
                 v->up_e = new Edge();
                 v->up_e->nghbr[0] = v;
                 
-                v->up_e->v[0] = v->aabb->c + kep::Vector3(v->aabb->hs.x, v->aabb->hs.y, -v->aabb->hs.z);
-                v->up_e->v[1] = v->aabb->c + kep::Vector3(-v->aabb->hs.x, v->aabb->hs.y, -v->aabb->hs.z);
+                v->up_e->v[0] = v->aabb->c + kep::Vector3(v->aabb->hs.x, v->aabb->hs.y, v->aabb->hs.z);
+                v->up_e->v[1] = v->aabb->c + kep::Vector3(-v->aabb->hs.x, v->aabb->hs.y, v->aabb->hs.z);
                 
                 
                 m_edge.push_back(v->up_e);
@@ -64,8 +64,8 @@ void ContGen::genEdges()
                 v->left_e = new Edge();
                 v->left_e->nghbr[0] = v;
                 
-                v->left_e->v[0] = v->aabb->c + kep::Vector3(-v->aabb->hs.x, v->aabb->hs.y, v->aabb->hs.z);
-                v->left_e->v[1] = v->aabb->c + kep::Vector3(-v->aabb->hs.x, v->aabb->hs.y, -v->aabb->hs.z);
+                v->left_e->v[0] = v->aabb->c + kep::Vector3(v->aabb->hs.x, v->aabb->hs.y, v->aabb->hs.z);
+                v->left_e->v[1] = v->aabb->c + kep::Vector3(v->aabb->hs.x, v->aabb->hs.y, -v->aabb->hs.z);
                 m_edge.push_back(v->left_e);
             }
             /////////////////////////////////////////////////////////////////////
@@ -84,8 +84,8 @@ void ContGen::genEdges()
                 v->down_e = new Edge();
                 v->down_e->nghbr[0] = v;
                 
-                v->down_e->v[0] = v->aabb->c + kep::Vector3(v->aabb->hs.x, v->aabb->hs.y, v->aabb->hs.z);
-                v->down_e->v[1] = v->aabb->c + kep::Vector3(-v->aabb->hs.x, v->aabb->hs.y, v->aabb->hs.z);
+                v->down_e->v[0] = v->aabb->c + kep::Vector3(v->aabb->hs.x, v->aabb->hs.y, -v->aabb->hs.z);
+                v->down_e->v[1] = v->aabb->c + kep::Vector3(-v->aabb->hs.x, v->aabb->hs.y, -v->aabb->hs.z);
                 m_edge.push_back(v->down_e);
             }
             /////////////////////////////////////////////////////////////////////
@@ -104,8 +104,8 @@ void ContGen::genEdges()
                 v->right_e = new Edge();
                 v->right_e->nghbr[0] = v;
                 
-                v->right_e->v[0] = v->aabb->c + kep::Vector3(v->aabb->hs.x, v->aabb->hs.y, v->aabb->hs.z);
-                v->right_e->v[1] = v->aabb->c + kep::Vector3(v->aabb->hs.x, v->aabb->hs.y, -v->aabb->hs.z);
+                v->right_e->v[0] = v->aabb->c + kep::Vector3(-v->aabb->hs.x, v->aabb->hs.y, v->aabb->hs.z);
+                v->right_e->v[1] = v->aabb->c + kep::Vector3(-v->aabb->hs.x, v->aabb->hs.y, -v->aabb->hs.z);
                 m_edge.push_back(v->right_e);
             }
             /////////////////////////////////////////////////////////////////////
@@ -201,7 +201,7 @@ void ContGen::traceContours()
                 if(currentEdge == initEdge)//check if the tracing is complete
                     break;
                 else
-                    con->m_contour.push_back(initEdge);//add edge to the contour
+                    con->m_contour.push_back(currentEdge);//add edge to the contour
             }
             else
             {
@@ -214,7 +214,7 @@ void ContGen::traceContours()
             }
         }
         /////////////////////////////////////////////////////////////////////////////
-        printf("num edg: %d \n", con->m_contour.size());
+        //printf("num edg: %d \n", con->m_contour.size());
         
         m_contours.push_back(con);//add the contour to the list of contours
     }

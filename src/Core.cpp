@@ -30,6 +30,7 @@ Core::Core(int _argc, char ** _argv)
     m_triangleMesh = new MeshGen();
     m_voxelVolumeMesh = new MeshGenLine();
     m_voxelVolumeOutlineMesh = new MeshGenLine();
+    m_contour = new MeshGenLine();
     
     m_shaderMinimal = new ShaderMin();
     m_shaderDefault = new ShaderDefault();
@@ -49,6 +50,7 @@ Core::~Core()
     delete m_triangleMesh;
     delete m_voxelVolumeMesh;
     delete m_voxelVolumeOutlineMesh;
+    delete m_contour;
     
     delete m_shaderMinimal;
     delete m_shaderDefault;

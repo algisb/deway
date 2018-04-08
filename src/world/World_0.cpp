@@ -12,9 +12,10 @@
 #include "deway/NMGen.h"
 #include "deway/AABB.h"
 #include "deway/Edge.h"
-#include <deway/RegGen.h>
+#include "deway/RegGen.h"
 #include <time.h>
-
+#include "deway/ContGen.h"
+#include "deway/Contour.h"
 
 using namespace kelp;
 
@@ -148,32 +149,50 @@ World_0::World_0(Core * _core) : World(_core)
 //         }
 //     }
     
-    //EXTERNAL EDGE VISUALS
-    for(uint regID = 0; regID<nmgen.m_regGen->m_regions.size(); regID++)
+    //CONTOUR VISUALS
+    std::vector<deway::Edge*> & cntr = nmgen.m_contGen->m_contours[0]->m_contour;
+    
+    for(uint i = 0; i < cntr.size()-1; i++)
     {
-        kep::Vector3 col = kep::Vector3(1, 0, 0);
-        for(uint i = 0; i<nmgen.m_regGen->m_regions[regID]->m_voxels.size(); i++)
-        {
-            bool isExt = false;
-            for(uint j = 0; j<4; j++)
-                if(nmgen.m_regGen->m_regions[regID]->m_voxels[i]->edg[j]->external)
-                {
-                    isExt = true;
-                    break;
-                }
-            
-            if(isExt)
-            {
-                refEntity = new Entity(this, "quad");
-                refTransform = (Transform*)refEntity->addComponent(new Transform(
-                                                    kep::Vector3(nmgen.m_regGen->m_regions[regID]->m_voxels[i]->aabb->c.x, nmgen.m_regGen->m_regions[regID]->m_voxels[i]->aabb->c.y + nmgen.m_voxelSize, nmgen.m_regGen->m_regions[regID]->m_voxels[i]->aabb->c.z),
-                                                    kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
-                                                    kep::Vector3(nmgen.m_voxelSize, nmgen.m_voxelSize, nmgen.m_voxelSize)
-                                                    ));
-                refEntity->addComponent(new Render(m_core->m_plane, m_core->m_shaderMinimal ,NULL, RenderMode::SOLID, col));
-            }
-        }
+        m_core->m_contour->addLine(cntr[i]->v[0], cntr[i+1]->v[0]);
     }
+    m_core->m_contour->gen();
+    
+    
+    refEntity = new Entity(this, "contour outline");
+    refTransform = (Transform*)refEntity->addComponent(new Transform(
+                                        kep::Vector3(0.0f, 0.0f, 0.0f),
+                                        kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
+                                        kep::Vector3(1.0f, 1.0f, 1.0f)
+                                        ));
+    refEntity->addComponent(new Render(m_core->m_contour, m_core->m_shaderMinimal, NULL, RenderMode::WIRE));
+    
+    
+    
+    //EXTERNAL EDGE VISUALS
+//     for(uint regID = 0; regID<nmgen.m_regGen->m_regions.size(); regID++)
+//     {
+//         kep::Vector3 col = kep::Vector3(1, 0, 0);
+//         for(uint i = 0; i<nmgen.m_regGen->m_regions[regID]->m_voxels.size(); i++)
+//         {
+//             bool isExt = false;
+//             for(uint j = 0; j<4; j++)
+//                 if(nmgen.m_regGen->m_regions[regID]->m_voxels[i]->edg[j]->external)
+//                 {
+//                     m_core->m_contour->addLine(nmgen.m_regGen->m_regions[regID]->m_voxels[i]->edg[j]->v[0], nmgen.m_regGen->m_regions[regID]->m_voxels[i]->edg[j]->v[1]);
+//                 }
+//         }
+//     }
+//     m_core->m_contour->gen();
+//     refEntity = new Entity(this, "contour outline");
+//     refTransform = (Transform*)refEntity->addComponent(new Transform(
+//                                         kep::Vector3(0.0f, 0.0f, 0.0f),
+//                                         kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
+//                                         kep::Vector3(1.0f, 1.0f, 1.0f)
+//                                         ));
+//     refEntity->addComponent(new Render(m_core->m_contour, m_core->m_shaderMinimal, NULL, RenderMode::WIRE));
+    
+    
     
     
     
