@@ -416,11 +416,28 @@ void NMGen::calcEdgeDistances()
     if(m_numTravVoxels > 0 && m_numEdgeVoxels > 0)
         for(uint i = 0; i<m_numTravVoxels; i++)
         {
+            
+            //cheeky mod//////////////////////////////////////////
+//             uint nn = 0;
+//             for(uint j = 0; j<8; j++)
+//             {
+//                 if(m_travVoxels[i]->nghbr[j] == NULL)
+//                     nn++;
+//             }
+//             if(nn == 5 || nn == 1)
+//             {
+//                 m_travVoxels[i]->dist = 7.0f;
+//                 continue;
+//             }
+            ///////////////////////////////////////////
+            
             if(m_travVoxels[i]->edge)
             {
                 m_travVoxels[i]->dist = 0.0f;
                 continue;
             }
+            
+            
             m_travVoxels[i]->dist = (m_travVoxels[i]->aabb->c - m_edgeVoxels[0]->aabb->c).magnitude();
             
             for(uint j = 0; j<m_numEdgeVoxels; j++)

@@ -88,9 +88,9 @@ void RegGen::create()
                         if(m_travVoxelsRef[i]->nghbr[j]->reg != NULL)//neighbour is part of a region
                         {
                             if(m_travVoxelsRef[i]->reg == NULL)
-                                m_travVoxelsRef[i]->reg = m_travVoxelsRef[i]->nghbr[j]->reg;
+                                m_travVoxelsRef[i]->reg = m_travVoxelsRef[i]->nghbr[j]->reg;//Join the neighbours region cuz ur not part of any region
                             else
-                                if(m_travVoxelsRef[i]->reg->m_voxels.size() < m_travVoxelsRef[i]->nghbr[j]->reg->m_voxels.size())
+                                if(m_travVoxelsRef[i]->reg->m_voxels.size() < m_travVoxelsRef[i]->nghbr[j]->reg->m_voxels.size())//join neighbours region as its larger than yours
                                     m_travVoxelsRef[i]->reg = m_travVoxelsRef[i]->nghbr[j]->reg;
                                 
                             break;

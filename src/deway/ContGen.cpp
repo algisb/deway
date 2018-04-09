@@ -45,6 +45,26 @@ void ContGen::genEdges()
                 v->up_e->v[0] = v->aabb->c + kep::Vector3(v->aabb->hs.x, v->aabb->hs.y, v->aabb->hs.z);
                 v->up_e->v[1] = v->aabb->c + kep::Vector3(-v->aabb->hs.x, v->aabb->hs.y, v->aabb->hs.z);
                 
+                //Compare Y values with neighbour voxels and set vertex y values to the largest one
+                //V0
+                int v0_cl[3] = {0,1,2};
+                for(uint l = 0; l<3; l++)
+                    if(v->nghbr[v0_cl[l]] != NULL)
+                    {
+                        float nu_y = (v->nghbr[v0_cl[l]]->aabb->c.y + v->nghbr[v0_cl[l]]->aabb->hs.y);
+                        if(nu_y > v->up_e->v[0].y)
+                            v->up_e->v[0].y = nu_y;
+                    }
+                
+                int v1_cl[3] = {0,7,6};
+                for(uint l = 0; l<3; l++)
+                    if(v->nghbr[v1_cl[l]] != NULL)
+                    {
+                        float nu_y = (v->nghbr[v1_cl[l]]->aabb->c.y + v->nghbr[v1_cl[l]]->aabb->hs.y);
+                        if(nu_y > v->up_e->v[1].y)
+                            v->up_e->v[1].y = nu_y;
+                    }
+                
                 
                 m_edge.push_back(v->up_e);
             }
@@ -66,6 +86,29 @@ void ContGen::genEdges()
                 
                 v->left_e->v[0] = v->aabb->c + kep::Vector3(v->aabb->hs.x, v->aabb->hs.y, v->aabb->hs.z);
                 v->left_e->v[1] = v->aabb->c + kep::Vector3(v->aabb->hs.x, v->aabb->hs.y, -v->aabb->hs.z);
+                
+                //Compare Y values with neighbour voxels and set vertex y values to the largest one
+                //V0
+                int v0_cl[3] = {0,1,2};
+                for(uint l = 0; l<3; l++)
+                    if(v->nghbr[v0_cl[l]] != NULL)
+                    {
+                        float nu_y = (v->nghbr[v0_cl[l]]->aabb->c.y + v->nghbr[v0_cl[l]]->aabb->hs.y);
+                        if(nu_y > v->left_e->v[0].y)
+                            v->left_e->v[0].y = nu_y;
+                    }
+                
+                int v1_cl[3] = {2,3,4};
+                for(uint l = 0; l<3; l++)
+                    if(v->nghbr[v1_cl[l]] != NULL)
+                    {
+                        float nu_y = (v->nghbr[v1_cl[l]]->aabb->c.y + v->nghbr[v1_cl[l]]->aabb->hs.y);
+                        if(nu_y > v->left_e->v[1].y)
+                            v->left_e->v[1].y = nu_y;
+                    }
+                
+                
+                
                 m_edge.push_back(v->left_e);
             }
             /////////////////////////////////////////////////////////////////////
@@ -86,6 +129,29 @@ void ContGen::genEdges()
                 
                 v->down_e->v[0] = v->aabb->c + kep::Vector3(v->aabb->hs.x, v->aabb->hs.y, -v->aabb->hs.z);
                 v->down_e->v[1] = v->aabb->c + kep::Vector3(-v->aabb->hs.x, v->aabb->hs.y, -v->aabb->hs.z);
+                
+                //Compare Y values with neighbour voxels and set vertex y values to the largest one
+                //V0
+                int v0_cl[3] = {2,3,4};
+                for(uint l = 0; l<3; l++)
+                    if(v->nghbr[v0_cl[l]] != NULL)
+                    {
+                        float nu_y = (v->nghbr[v0_cl[l]]->aabb->c.y + v->nghbr[v0_cl[l]]->aabb->hs.y);
+                        if(nu_y > v->down_e->v[0].y)
+                            v->down_e->v[0].y = nu_y;
+                    }
+                
+                int v1_cl[3] = {4,5,6};
+                for(uint l = 0; l<3; l++)
+                    if(v->nghbr[v1_cl[l]] != NULL)
+                    {
+                        float nu_y = (v->nghbr[v1_cl[l]]->aabb->c.y + v->nghbr[v1_cl[l]]->aabb->hs.y);
+                        if(nu_y > v->down_e->v[1].y)
+                            v->down_e->v[1].y = nu_y;
+                    }
+                
+                
+                
                 m_edge.push_back(v->down_e);
             }
             /////////////////////////////////////////////////////////////////////
@@ -106,6 +172,29 @@ void ContGen::genEdges()
                 
                 v->right_e->v[0] = v->aabb->c + kep::Vector3(-v->aabb->hs.x, v->aabb->hs.y, v->aabb->hs.z);
                 v->right_e->v[1] = v->aabb->c + kep::Vector3(-v->aabb->hs.x, v->aabb->hs.y, -v->aabb->hs.z);
+                
+                //Compare Y values with neighbour voxels and set vertex y values to the largest one
+                //V0
+                int v0_cl[3] = {0,7,6};
+                for(uint l = 0; l<3; l++)
+                    if(v->nghbr[v0_cl[l]] != NULL)
+                    {
+                        float nu_y = (v->nghbr[v0_cl[l]]->aabb->c.y + v->nghbr[v0_cl[l]]->aabb->hs.y);
+                        if(nu_y > v->right_e->v[0].y)
+                            v->right_e->v[0].y = nu_y;
+                    }
+                
+                int v1_cl[3] = {4,5,6};
+                for(uint l = 0; l<3; l++)
+                    if(v->nghbr[v1_cl[l]] != NULL)
+                    {
+                        float nu_y = (v->nghbr[v1_cl[l]]->aabb->c.y + v->nghbr[v1_cl[l]]->aabb->hs.y);
+                        if(nu_y > v->right_e->v[1].y)
+                            v->right_e->v[1].y = nu_y;
+                    }
+                
+                
+                
                 m_edge.push_back(v->right_e);
             }
             /////////////////////////////////////////////////////////////////////

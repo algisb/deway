@@ -150,11 +150,14 @@ World_0::World_0(Core * _core) : World(_core)
 //     }
     
     //CONTOUR VISUALS
-    std::vector<deway::Edge*> & cntr = nmgen.m_contGen->m_contours[0]->m_contour;
-    
-    for(uint i = 0; i < cntr.size()-1; i++)
+    for(uint j = 0; j<nmgen.m_contGen->m_contours.size(); j++)
     {
-        m_core->m_contour->addLine(cntr[i]->v[0], cntr[i+1]->v[0]);
+        std::vector<deway::Edge*> & cntr = nmgen.m_contGen->m_contours[j]->m_contour;
+        
+        for(uint i = 0; i < cntr.size()-1; i++)
+        {
+            m_core->m_contour->addLine(cntr[i]->v[0], cntr[i+1]->v[0]);
+        }
     }
     m_core->m_contour->gen();
     
@@ -206,6 +209,7 @@ World_0::World_0(Core * _core) : World(_core)
 //                                             kep::Vector3(nmgen.m_voxelSize, nmgen.m_voxelSize, nmgen.m_voxelSize)
 //                                             ));
 //         float shade = nmgen.m_travVoxels[i]->dist/nmgen.m_maxEdgeDist;
+//         
 //         refEntity->addComponent(new Render(m_core->m_plane, m_core->m_shaderMinimal ,NULL, RenderMode::SOLID, kep::Vector3(shade, shade, shade)));
 //     }
     
