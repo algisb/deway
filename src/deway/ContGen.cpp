@@ -42,12 +42,12 @@ void ContGen::genEdges()
                 v->up_e = new Edge();
                 v->up_e->nghbr[0] = v;
                 
-                v->up_e->v[0] = v->aabb->c + kep::Vector3(v->aabb->hs.x, v->aabb->hs.y, v->aabb->hs.z);
-                v->up_e->v[1] = v->aabb->c + kep::Vector3(-v->aabb->hs.x, v->aabb->hs.y, v->aabb->hs.z);
+                v->up_e->v[0] = v->aabb->c + kep::Vector3(-v->aabb->hs.x, v->aabb->hs.y, v->aabb->hs.z);
+                v->up_e->v[1] = v->aabb->c + kep::Vector3(v->aabb->hs.x, v->aabb->hs.y, v->aabb->hs.z);
                 
                 //Compare Y values with neighbour voxels and set vertex y values to the largest one
                 //V0
-                int v0_cl[3] = {0,1,2};
+                int v0_cl[3] = {0,7,6};
                 for(uint l = 0; l<3; l++)
                     if(v->nghbr[v0_cl[l]] != NULL)
                     {
@@ -56,7 +56,7 @@ void ContGen::genEdges()
                             v->up_e->v[0].y = nu_y;
                     }
                 
-                int v1_cl[3] = {0,7,6};
+                int v1_cl[3] = {0,1,2};
                 for(uint l = 0; l<3; l++)
                     if(v->nghbr[v1_cl[l]] != NULL)
                     {
@@ -170,12 +170,12 @@ void ContGen::genEdges()
                 v->right_e = new Edge();
                 v->right_e->nghbr[0] = v;
                 
-                v->right_e->v[0] = v->aabb->c + kep::Vector3(-v->aabb->hs.x, v->aabb->hs.y, v->aabb->hs.z);
-                v->right_e->v[1] = v->aabb->c + kep::Vector3(-v->aabb->hs.x, v->aabb->hs.y, -v->aabb->hs.z);
+                v->right_e->v[0] = v->aabb->c + kep::Vector3(-v->aabb->hs.x, v->aabb->hs.y, -v->aabb->hs.z);
+                v->right_e->v[1] = v->aabb->c + kep::Vector3(-v->aabb->hs.x, v->aabb->hs.y, v->aabb->hs.z);
                 
                 //Compare Y values with neighbour voxels and set vertex y values to the largest one
                 //V0
-                int v0_cl[3] = {0,7,6};
+                int v0_cl[3] = {4,5,6};
                 for(uint l = 0; l<3; l++)
                     if(v->nghbr[v0_cl[l]] != NULL)
                     {
@@ -184,7 +184,7 @@ void ContGen::genEdges()
                             v->right_e->v[0].y = nu_y;
                     }
                 
-                int v1_cl[3] = {4,5,6};
+                int v1_cl[3] = {0,7,6};
                 for(uint l = 0; l<3; l++)
                     if(v->nghbr[v1_cl[l]] != NULL)
                     {
