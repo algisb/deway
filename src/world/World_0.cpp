@@ -16,6 +16,7 @@
 #include <time.h>
 #include "deway/ContGen.h"
 #include "deway/Contour.h"
+#include "deway/Vertex.h"
 
 using namespace kelp;
 
@@ -152,11 +153,13 @@ World_0::World_0(Core * _core) : World(_core)
     //CONTOUR VISUALS
     for(uint j = 0; j<nmgen.m_contGen->m_contours.size(); j++)
     {
-        std::vector<deway::Edge*> & cntr = nmgen.m_contGen->m_contours[j]->m_contour;
-        
-        for(uint i = 0; i < cntr.size()-1; i++)
+        std::vector<deway::Vertex> & verts = nmgen.m_contGen->m_contours[j]->m_verts;
+        for(uint i = 0; i < verts.size(); i++)
         {
-            m_core->m_contour->addLine(cntr[i]->v[0], cntr[i+1]->v[0]);
+            if(i == (verts.size()-1))
+                m_core->m_contour->addLine(verts[i].pos, verts[0].pos);
+            else
+                m_core->m_contour->addLine(verts[i].pos, verts[i+1].pos);
         }
     }
     m_core->m_contour->gen();

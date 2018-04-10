@@ -4,6 +4,7 @@
 #include "Voxel.h"
 #include "AABB.h"
 #include "Contour.h"
+#include "Vertex.h"
 using namespace deway;
 ContGen::ContGen(std::vector<Region*> * _regions)
 {
@@ -11,12 +12,16 @@ ContGen::ContGen(std::vector<Region*> * _regions)
     genEdges();
     flagExtEdges();
     traceContours();
+    extractContourVertex();
 }
 
 ContGen::~ContGen()
 {
     for(uint i = 0; i<m_edge.size(); i++)
         delete m_edge[i];
+    
+    for(uint i = 0; i<m_contours.size(); i++)
+        delete m_contours[i];
 }
 
 void ContGen::genEdges()
@@ -257,7 +262,7 @@ void ContGen::traceContours()
             }
         }
         //printf("dir: %d \n", direction);
-        con->m_contour.push_back(initEdge);//add initial edge to the contour
+        con->m_cntrE.push_back(initEdge);//add initial edge to the contour
         
         
         
@@ -290,7 +295,7 @@ void ContGen::traceContours()
                 if(currentEdge == initEdge)//check if the tracing is complete
                     break;
                 else
-                    con->m_contour.push_back(currentEdge);//add edge to the contour
+                    con->m_cntrE.push_back(currentEdge);//add edge to the contour
             }
             else
             {
@@ -310,4 +315,45 @@ void ContGen::traceContours()
 
 }
 
+void ContGen::extractContourVertex()
+{
+    for(uint i = 0; i<m_contours.size(); i++)
+    {
+        Edge * prevEdge = m_contours[i]->m_cntrE[m_contours[i]->m_cntrE.size()-1];
+        for(uint j = 0; j<m_contours[i]->m_cntrE.size(); j++)
+        {
+            Edge * tmpEdge = m_contours[i]->m_cntrE[j];
+            Vertex vert;
+            
+            vert.pos = tmpEdge->v[0];
+            
+            
+            //find NULL regions
+            void * currentRegs[2] = {NULL,NULL};
+            void * prevRegs[2] = {NULL,NULL};
+            
+            for(uint k = 0; k<2; k++)
+            {
+                if(tmpEdge->nghbr[k] != NULL)
+                    currentRegs[k] = tmpEdge->nghbr[k]->reg;
+                
+                if(prevEdge->nghbr[k] != NULL)
+                    prevRegs[k] = prevEdge->nghbr[k]->reg;
+            }
+            
+            if(//Check if this vertex needs to be locked
+                !((prevRegs[0] == currentRegs[0]  &&  prevRegs[1] == currentRegs[1]) ||
+                (prevRegs[0] == currentRegs[1]  &&  prevRegs[1] == currentRegs[0]))
+            )
+            {
+                vert.locked = true;
+            }
+            
+            m_contours[i]->m_verts.push_back(vert);
+            prevEdge = tmpEdge;
+        }
+    }
+    //printf("num edg: %d \n", m_contours[0]->m_cntrE.size());
+    //printf("numvert: %d \n", m_contours[0]->m_cntrV.size());
+}
 
