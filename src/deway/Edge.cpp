@@ -7,6 +7,7 @@ Edge::Edge()
     v[1] = kep::Vector3();
     nghbr[0] = NULL;
     nghbr[1] = NULL;
+    creator = NULL;
 }
 
 Edge::~Edge()

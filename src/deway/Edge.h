@@ -11,6 +11,7 @@ namespace deway
         bool external;//to flag as external edge
         kep::Vector3 v[2];
         Voxel * nghbr[2];
+        Voxel * creator;//stores memory location of the voxels which initialised this edge
         Edge();
         ~Edge();
     };

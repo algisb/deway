@@ -47,6 +47,7 @@ void ContGen::genEdges()
             if(v->up_e == NULL)
             {
                 v->up_e = new Edge();
+                v->up_e->creator = v;
                 v->up_e->nghbr[0] = v;
                 
                 v->up_e->v[0] = v->aabb->c + kep::Vector3(-v->aabb->hs.x, v->aabb->hs.y, v->aabb->hs.z);
@@ -89,6 +90,7 @@ void ContGen::genEdges()
             if(v->left_e == NULL)
             {
                 v->left_e = new Edge();
+                v->left_e->creator = v;
                 v->left_e->nghbr[0] = v;
                 
                 v->left_e->v[0] = v->aabb->c + kep::Vector3(v->aabb->hs.x, v->aabb->hs.y, v->aabb->hs.z);
@@ -132,6 +134,7 @@ void ContGen::genEdges()
             if(v->down_e == NULL)
             {
                 v->down_e = new Edge();
+                v->down_e->creator = v;
                 v->down_e->nghbr[0] = v;
                 
                 v->down_e->v[0] = v->aabb->c + kep::Vector3(v->aabb->hs.x, v->aabb->hs.y, -v->aabb->hs.z);
@@ -175,6 +178,7 @@ void ContGen::genEdges()
             if(v->right_e == NULL)
             {
                 v->right_e = new Edge();
+                v->right_e->creator = v;
                 v->right_e->nghbr[0] = v;
                 
                 v->right_e->v[0] = v->aabb->c + kep::Vector3(-v->aabb->hs.x, v->aabb->hs.y, -v->aabb->hs.z);
@@ -231,6 +235,7 @@ void ContGen::traceContours()
     {
         deway::Region & rr = (*(*m_regions_ref)[i]);
         Contour * con = new Contour();
+        con->reg = (*m_regions_ref)[i];
         
         Edge * initEdge = NULL;
         Voxel * initVoxel = NULL;
@@ -327,9 +332,23 @@ void ContGen::extractContourVertex()
             Edge * tmpEdge = m_contours[i]->m_cntrE[j];
             Vertex * vert = new Vertex();
             
-            vert->pos = tmpEdge->v[0];
             
-            
+            ///////////////////////////////////////////////////////////////////////Cheeky little bug
+            //find which vertex edge vertex to keep
+            if(tmpEdge->nghbr[0] == NULL || tmpEdge->nghbr[1] == NULL)
+                vert->pos = tmpEdge->v[0];
+            else
+                for(uint n = 0 ; n<2; n++)
+                    if(tmpEdge->nghbr[n]->reg == m_contours[i]->reg)//which voxel does the edge get traced from
+                    {
+                        if(tmpEdge->nghbr[n] == tmpEdge->creator)//did this voxel initialised the edge
+                            vert->pos = tmpEdge->v[0];
+                        else
+                            vert->pos = tmpEdge->v[1];
+                        break;
+                    }
+            /////////////////////////////////////////////////////////////////////////////////////////
+           
             //find NULL regions
             void * currentRegs[2] = {NULL,NULL};
             void * prevRegs[2] = {NULL,NULL};
@@ -477,12 +496,6 @@ void ContGen::reduceVerts()
                 m_contours[i]->m_reducedVerts.push_back(m_contours[i]->m_verts[j]);
             }
         }
-
-    
-    
-        
-        
-        
 }
 
 
