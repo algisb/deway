@@ -153,7 +153,7 @@ World_0::World_0(Core * _core) : World(_core)
     //CONTOUR VISUALS
 //     for(uint j = 0; j<nmgen.m_contGen->m_contours.size(); j++)
 //     {
-//         std::vector<deway::Vertex*> & verts = nmgen.m_contGen->m_contours[j]->m_verts;
+//         std::vector<deway::Vertex*> & verts = nmgen.m_contGen->m_contours[j]->m_reducedVerts;
 //         for(uint i = 0; i < verts.size(); i++)
 //         {
 //             if(i == (verts.size()-1))
@@ -176,11 +176,11 @@ World_0::World_0(Core * _core) : World(_core)
     //SEGMENT VISUALS
     for(uint j = 0; j<nmgen.m_contGen->m_contours.size(); j++)
     {
-        std::vector<std::vector<deway::Vertex*>> & verts = nmgen.m_contGen->m_contours[j]->m_segments;
-        for(uint m = 0; m<verts.size(); m++)
-        for(uint i = 0; i < verts[m].size()-1; i++)
+        std::vector<std::vector<deway::Vertex*>> & segs = nmgen.m_contGen->m_contours[j]->m_segments;
+        for(uint m = 0; m<segs.size(); m++)
+        for(uint i = 0; i < segs[m].size()-1; i++)
         {
-                m_core->m_contour->addLine(verts[m][i]->pos, verts[m][i+1]->pos);
+                m_core->m_contour->addLine(segs[m][i]->pos, segs[m][i+1]->pos);
         }
     }
     m_core->m_contour->gen();

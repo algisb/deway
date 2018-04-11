@@ -414,18 +414,75 @@ void ContGen::genSegments()//Prepares the contours for verticies for reduction a
     
 }
 
-void ContGen::reduceVerts() //Douglas peucker algorithm
+void ContGen::RDP_simp(std::vector<Vertex*> * _segment, float _tollerance, uint _start, uint _end) //Ramer–Douglas–Peucker algorithm adaptation (Recursive function)
+{
+    if(_segment->size() < 3)
+        return;
+    
+    kep::Vector3 d = ((*_segment)[_end]->pos - (*_segment)[_start]->pos).normalized(); //edge from start point to finish
+    //d.normalize();
+    
+    Vertex * nv = NULL;
+    float nvDisp = 0.0f;
+    uint nvIndex = 0;
+    
+    for(uint i = _start+1; i<= _end-1; i++)//find the vertex with the largest displacement from the edge
+    {
+        kep::Vector3 vec0 = (*_segment)[i]->pos - (*_segment)[_start]->pos;
+        float mag = kep::dot(vec0,d);
+        kep::Vector3 p = (d * mag) + (*_segment)[_start]->pos;
+        kep::Vector3 vec1 = (*_segment)[i]->pos - p;
+        float disp = vec1.magnitude();
+        
+        if(disp > nvDisp)
+        {
+            nv = (*_segment)[i];
+            nvDisp = disp;
+            nvIndex = i;
+        }
+    }
+    if(nvDisp > _tollerance)
+        if(nv != NULL) //THIS IS THE ONE
+        {
+            nv->locked = true;// lock it
+            RDP_simp(_segment, _tollerance, _start, nvIndex);
+            RDP_simp(_segment, _tollerance, nvIndex, _end);
+        }
+}
+
+
+void ContGen::reduceVerts() 
 {
     //CONFIG PARAMS
-    float tollerance = 0.5f;
+    float tollerance = 1.0f;
     //////////////////
     
+    //Apply vertex reduction algorithm to each segment
+    for(uint i = 0; i<m_contours.size(); i++)//each contour
+        for(uint j = 0; j<m_contours[i]->m_segments.size(); j++)//each segment of the contour
+        {
+            //Vertex * start = m_contours[i]->m_segments[j][0];
+            //Vertex * end = m_contours[i]->m_segments[j][m_contours[i]->m_segments[j].size()-1];
+            
+            RDP_simp(&m_contours[i]->m_segments[j], tollerance, 0, m_contours[i]->m_segments[j].size()-1);
+            //for(uint k = 0; k<)
+        }
+        
+    //Extract locked verticies
     for(uint i = 0; i<m_contours.size(); i++)
-    {
-        printf("Cont %d \n -----------", i);
-        printf("Num segments: %d \n", m_contours[i]->m_segments.size());
-        //printf("segment: %d \n", segment.size());
-    }
+        for(uint j = 0; j<m_contours[i]->m_verts.size(); j++)
+        {
+            if(m_contours[i]->m_verts[j]->locked)
+            {
+                m_contours[i]->m_reducedVerts.push_back(m_contours[i]->m_verts[j]);
+            }
+        }
+
+    
+    
+        
+        
+        
 }
 
 

@@ -1,6 +1,7 @@
 #ifndef CONTGEN_H_
 #define CONTGEN_H_
 #include <vector>
+#include "Vertex.h"
 namespace deway
 {
     class Contour;
@@ -21,6 +22,7 @@ namespace deway
         
         void extractContourVertex(); //NOT FINSIHED
         void genSegments();
+        void RDP_simp(std::vector<Vertex*> * _segment, float _tollerance, uint _start, uint _end);
         void reduceVerts();
     };
 };
