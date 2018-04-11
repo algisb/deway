@@ -11,8 +11,8 @@ namespace deway
     {
     public:
         std::vector<Edge*> m_cntrE; //Traced Contour made of edges (ordered)
-        std::vector<Vertex> m_verts; //Contour made of verticies (ordered)
-        std::vector<Vertex> m_lockedVerts;
+        std::vector<Vertex*> m_verts; //Contour made of verticies (ordered)
+        std::vector<std::vector<Vertex*>> m_segments; // segments rdy to be reduced
         Contour();
         ~Contour();
         void extratVertexData();

@@ -127,7 +127,7 @@ void RegGen::create()
 void RegGen::merge()
 {
     //CONFIGS
-    uint minRegionSize = 200;//CONFIGURATION PARAMETER
+    uint minRegionSize = 150;//CONFIGURATION PARAMETER
     //////////////////////
 
     

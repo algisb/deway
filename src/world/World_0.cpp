@@ -151,15 +151,36 @@ World_0::World_0(Core * _core) : World(_core)
 //     }
     
     //CONTOUR VISUALS
+//     for(uint j = 0; j<nmgen.m_contGen->m_contours.size(); j++)
+//     {
+//         std::vector<deway::Vertex*> & verts = nmgen.m_contGen->m_contours[j]->m_verts;
+//         for(uint i = 0; i < verts.size(); i++)
+//         {
+//             if(i == (verts.size()-1))
+//                 m_core->m_contour->addLine(verts[i]->pos, verts[0]->pos);
+//             else
+//                 m_core->m_contour->addLine(verts[i]->pos, verts[i+1]->pos);
+//         }
+//     }
+//     m_core->m_contour->gen();
+//     
+//     
+//     refEntity = new Entity(this, "contour outline");
+//     refTransform = (Transform*)refEntity->addComponent(new Transform(
+//                                         kep::Vector3(0.0f, 0.0f, 0.0f),
+//                                         kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
+//                                         kep::Vector3(1.0f, 1.0f, 1.0f)
+//                                         ));
+//     refEntity->addComponent(new Render(m_core->m_contour, m_core->m_shaderMinimal, NULL, RenderMode::WIRE));
+    
+    //SEGMENT VISUALS
     for(uint j = 0; j<nmgen.m_contGen->m_contours.size(); j++)
     {
-        std::vector<deway::Vertex> & verts = nmgen.m_contGen->m_contours[j]->m_verts;
-        for(uint i = 0; i < verts.size(); i++)
+        std::vector<std::vector<deway::Vertex*>> & verts = nmgen.m_contGen->m_contours[j]->m_segments;
+        for(uint m = 0; m<verts.size(); m++)
+        for(uint i = 0; i < verts[m].size()-1; i++)
         {
-            if(i == (verts.size()-1))
-                m_core->m_contour->addLine(verts[i].pos, verts[0].pos);
-            else
-                m_core->m_contour->addLine(verts[i].pos, verts[i+1].pos);
+                m_core->m_contour->addLine(verts[m][i]->pos, verts[m][i+1]->pos);
         }
     }
     m_core->m_contour->gen();
@@ -172,8 +193,6 @@ World_0::World_0(Core * _core) : World(_core)
                                         kep::Vector3(1.0f, 1.0f, 1.0f)
                                         ));
     refEntity->addComponent(new Render(m_core->m_contour, m_core->m_shaderMinimal, NULL, RenderMode::WIRE));
-    
-    
     
     //EXTERNAL EDGE VISUALS
 //     for(uint regID = 0; regID<nmgen.m_regGen->m_regions.size(); regID++)

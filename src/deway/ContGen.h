@@ -18,7 +18,10 @@ namespace deway
         void genEdges();
         void flagExtEdges();
         void traceContours();
-        void extractContourVertex();
+        
+        void extractContourVertex(); //NOT FINSIHED
+        void genSegments();
+        void reduceVerts();
     };
 };
 #endif

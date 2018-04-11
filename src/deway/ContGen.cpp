@@ -13,6 +13,8 @@ ContGen::ContGen(std::vector<Region*> * _regions)
     flagExtEdges();
     traceContours();
     extractContourVertex();
+    genSegments();
+    reduceVerts();
 }
 
 ContGen::~ContGen()
@@ -323,9 +325,9 @@ void ContGen::extractContourVertex()
         for(uint j = 0; j<m_contours[i]->m_cntrE.size(); j++)
         {
             Edge * tmpEdge = m_contours[i]->m_cntrE[j];
-            Vertex vert;
+            Vertex * vert = new Vertex();
             
-            vert.pos = tmpEdge->v[0];
+            vert->pos = tmpEdge->v[0];
             
             
             //find NULL regions
@@ -346,14 +348,84 @@ void ContGen::extractContourVertex()
                 (prevRegs[0] == currentRegs[1]  &&  prevRegs[1] == currentRegs[0]))
             )
             {
-                vert.locked = true;
+                vert->locked = true;
             }
             
             m_contours[i]->m_verts.push_back(vert);
             prevEdge = tmpEdge;
         }
     }
+    
+    //add 2 locked verticies for regions with 0 region connections
+    //TODO
+    
     //printf("num edg: %d \n", m_contours[0]->m_cntrE.size());
     //printf("numvert: %d \n", m_contours[0]->m_cntrV.size());
 }
+
+
+void ContGen::genSegments()//Prepares the contours for verticies for reduction algorithm
+{
+    
+    for(uint i = 0; i<m_contours.size(); i++)
+    {
+        ////////////////////////////////////////////////////////
+        Vertex * initVertex = NULL;
+        bool end = false;
+        for(uint j = 0; j<m_contours[i]->m_verts.size(); j++)//for each vertex in the contour
+        {
+            if(m_contours[i]->m_verts[j]->locked)//found the starting point
+            {
+                std::vector<Vertex*> segment;
+                
+                if(initVertex == NULL)
+                    initVertex = m_contours[i]->m_verts[j];
+                
+                segment.push_back(m_contours[i]->m_verts[j]);
+                
+                uint iter = j+1;
+
+                
+                while(1)//find the end point
+                {
+                    if(iter > (m_contours[i]->m_verts.size()-1))//warp to the begining
+                        iter = 0;
+                    
+                    segment.push_back(m_contours[i]->m_verts[iter]);
+                    if(m_contours[i]->m_verts[iter]->locked)
+                    {
+                        if(m_contours[i]->m_verts[iter] == initVertex)
+                            end = true;
+                        break;
+                    }
+                    
+                    iter++;
+                }
+                
+                m_contours[i]->m_segments.push_back(segment);
+                //printf("segment: %d \n", segment.size());
+            }
+            if(end)
+                break;
+            
+        }
+        ////////////////////////////////////////////////////////
+    }
+    
+}
+
+void ContGen::reduceVerts() //Douglas peucker algorithm
+{
+    //CONFIG PARAMS
+    float tollerance = 0.5f;
+    //////////////////
+    
+    for(uint i = 0; i<m_contours.size(); i++)
+    {
+        printf("Cont %d \n -----------", i);
+        printf("Num segments: %d \n", m_contours[i]->m_segments.size());
+        //printf("segment: %d \n", segment.size());
+    }
+}
+
 
