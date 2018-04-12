@@ -375,8 +375,37 @@ void ContGen::extractContourVertex()
         }
     }
     
-    //add 2 locked verticies for regions with 0 region connections
-    //TODO
+    //lock 2 verticies for regions with 0 region connections
+    for(uint i = 0; i<m_contours.size(); i++)
+    {
+        uint locks = false;
+        for(uint j = 0; j<m_contours[i]->m_verts.size(); j++)
+            if(m_contours[i]->m_verts[j]->locked)
+            {
+                locks = true;
+                break;
+            }
+            
+        if(!locks && m_contours[i]->m_verts.size() > 2)
+        {
+            Vertex * v[2] = {m_contours[i]->m_verts[0], m_contours[i]->m_verts[1]};
+            float d = (v[1]->pos - v[0]->pos).magnitude();
+            
+            for(uint j = 2; j<m_contours[i]->m_verts.size(); j++)
+            {
+                float dn = (m_contours[i]->m_verts[j]->pos - v[0]->pos).magnitude();
+                if(dn > d)
+                {
+                    v[1] = m_contours[i]->m_verts[j];
+                    d = dn;
+                }
+            }
+            v[0]->locked = true; //lock the first vertex
+            v[1]->locked = true; //lock the second vertex
+        }
+            
+        
+    }
     
     //printf("num edg: %d \n", m_contours[0]->m_cntrE.size());
     //printf("numvert: %d \n", m_contours[0]->m_cntrV.size());
@@ -473,7 +502,7 @@ void ContGen::RDP_simp(std::vector<Vertex*> * _segment, float _tollerance, uint 
 void ContGen::reduceVerts() 
 {
     //CONFIG PARAMS
-    float tollerance = 1.0f;
+    float tollerance = 0.7f;
     //////////////////
     
     //Apply vertex reduction algorithm to each segment

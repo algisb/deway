@@ -279,15 +279,15 @@ void NMGen::voxelize()
                     if(m_spans[i].m_voxels[k]->aabb->triTest(&m_triangles[j]) == 1)
                     {
                         m_spans[i].m_voxels[k]->overlaps = true;
-                        if(m_spans[i].m_voxels[k]->traversable == false && slopeCheck(&m_triangles[j]) == true && !m_spans[i].m_voxels[k]->blacklisted)//0.9 being small slopes, 0.5 big slopes
+                        if(m_spans[i].m_voxels[k]->traversable == false && slopeCheck(&m_triangles[j]) == true /*&& !m_spans[i].m_voxels[k]->blacklisted*/)//0.9 being small slopes, 0.5 big slopes
                         {
                             m_spans[i].m_voxels[k]->traversable = true;
                             m_numTravVoxels++;
                         }
-                        else
-                        {
-                            m_spans[i].m_voxels[k]->blacklisted = true;
-                        }
+//                         else
+//                         {
+//                             m_spans[i].m_voxels[k]->blacklisted = true;
+//                         }
                     }
                 }
             }
