@@ -46,13 +46,60 @@ void ContGen::genEdges()
                  {
                      v->up_e = v->up->down_e;
                      v->up_e->nghbr[1] = v;
-                     
-                     topLeft = v->up->down_e->vertex[1];
-                     topRight = v->up->down_e->vertex[0];
+                     if(topLeft == NULL)
+                        topLeft = v->up->down_e->vertex[1];
+                     if(topRight == NULL)
+                        topRight = v->up->down_e->vertex[0];
                  }
             }
-            if(v->up_e == NULL)
-            {                
+            
+            //DOWN EDGE
+            if(v->down != NULL)
+            {
+                if(v->down->up_e != NULL)
+                {
+                    v->down_e = v->down->up_e;
+                    v->down_e->nghbr[1] = v;
+                    if(botLeft == NULL)
+                        botLeft = v->down->up_e->vertex[0];
+                    if(botRight == NULL)
+                        botRight = v->down->up_e->vertex[1];
+                }
+            }
+            
+            //LEFT EDGE
+            if(v->left != NULL)
+            {
+                if(v->left->right_e != NULL)
+                {
+                    v->left_e = v->left->right_e;
+                    v->left_e->nghbr[1] = v;
+                    
+                    if(topLeft == NULL)
+                        topLeft = v->left->right_e->vertex[0];
+                    if(botLeft == NULL)
+                        botLeft = v->left->right_e->vertex[1];
+                }
+            }
+            
+            //RIGHT EDGE
+            if(v->right != NULL)
+            {
+                if(v->right->left_e != NULL)
+                {
+                    v->right_e = v->right->left_e;
+                    v->right_e->nghbr[1] = v;
+                    
+                    if(topRight == NULL)
+                        topRight = v->right->left_e->vertex[1];
+                    if(botRight == NULL)
+                        botRight = v->right->left_e->vertex[0];
+                }
+            }
+            
+            //Find verticies-----------------------------------------------------------------------------------
+            if(topLeft == NULL)
+            {
                 //find topLeft///////////////////////////////////
                 //upper neighbour
                 if(v->up != NULL)
@@ -96,7 +143,10 @@ void ContGen::genEdges()
                         }
                     m_vertex.push_back(topLeft);
                 }
-                
+            }
+            
+            if(topRight == NULL)
+            {
                 //find topRight///////////////////////////////////
                 //upper neighbour
                 if(v->up != NULL)
@@ -137,33 +187,9 @@ void ContGen::genEdges()
                         }
                     m_vertex.push_back(topRight);
                 }
-                
-            
-                Edge * edge = new Edge();
-                edge->vertex[0] = topLeft;
-                edge->vertex[1] = topRight;
-                
-                edge->nghbr[0] = v;
-                
-                m_edge.push_back(edge);
-                v->up_e = edge;
             }
             
-            /////////////////////////////////////////////////////////////////////
-            
-            //DOWN EDGE
-            if(v->down != NULL)
-            {
-                if(v->down->up_e != NULL)
-                {
-                    v->down_e = v->down->up_e;
-                    v->down_e->nghbr[1] = v;
-                    
-                    botLeft = v->down->up_e->vertex[0];
-                    botRight = v->down->up_e->vertex[1];
-                }
-            }
-            if(v->down_e == NULL)
+            if(botLeft == NULL)
             {
                 //find botLeft///////////////////////////////////
                 if(v->down != NULL)
@@ -203,7 +229,10 @@ void ContGen::genEdges()
                         }
                         m_vertex.push_back(botLeft);
                 }
-                
+            }
+            
+            if(botRight == NULL)
+            {
                 //find botRight///////////////////////////////////
                 if(v->down != NULL)
                 {
@@ -242,6 +271,23 @@ void ContGen::genEdges()
                         m_vertex.push_back(botRight);
                     
                 }
+            }
+            /////////////////////////////////////////////////////////////////////
+            
+            if(v->up_e == NULL)
+            {                
+                Edge * edge = new Edge();
+                edge->vertex[0] = topLeft;
+                edge->vertex[1] = topRight;
+                
+                edge->nghbr[0] = v;
+                
+                m_edge.push_back(edge);
+                v->up_e = edge;
+            }
+            
+            if(v->down_e == NULL)
+            {
                 
                 Edge * edge = new Edge();
                 edge->vertex[0] = botRight;
@@ -256,15 +302,7 @@ void ContGen::genEdges()
             
             /////////////////////////////////////////////////////////////////////
             
-             //LEFT EDGE
-            if(v->left != NULL)
-            {
-                if(v->left->right_e != NULL)
-                {
-                    v->left_e = v->left->right_e;
-                    v->left_e->nghbr[1] = v;
-                }
-            }
+
             if(v->left_e == NULL)
             {
                 Edge * edge = new Edge();
@@ -276,18 +314,8 @@ void ContGen::genEdges()
                 m_edge.push_back(edge);
                 v->left_e = edge;
             }
-
-            /////////////////////////////////////////////////////////////////////
             
-            //RIGHT EDGE
-            if(v->right != NULL)
-            {
-                if(v->right->left_e != NULL)
-                {
-                    v->right_e = v->right->left_e;
-                    v->right_e->nghbr[1] = v;
-                }
-            }
+
             if(v->right_e == NULL)
             {
                 Edge * edge = new Edge();
@@ -310,14 +338,32 @@ void ContGen::genEdges()
 void ContGen::flagExtEdges()
 {
     //flag external regions
-    for(uint i = 0; i < m_edge.size(); i++)
+//     for(uint i = 0; i < m_edge.size(); i++)
+//     {
+//         if(m_edge[i]->nghbr[0] == NULL || m_edge[i]->nghbr[1] == NULL)
+//             m_edge[i]->external = true;
+//          else
+//              if(m_edge[i]->nghbr[0]->reg != m_edge[i]->nghbr[1]->reg)
+//                  m_edge[i]->external = true;
+//     }
+    
+    
+    for(uint j = 0; j<m_regions_ref->size(); j++)
     {
-        if(m_edge[i]->nghbr[0] == NULL || m_edge[i]->nghbr[1] == NULL)
-            m_edge[i]->external = true;
-         else
-             if(m_edge[i]->nghbr[0]->reg != m_edge[i]->nghbr[1]->reg)
-                 m_edge[i]->external = true;
+        for(uint k = 0; k<(*m_regions_ref)[j]->m_voxels.size(); k++)
+            for(uint l = 0; l<4; l++)
+            {
+                //(*m_regions_ref)[j]->m_voxels[k]->edg[l];
+                
+                if((*m_regions_ref)[j]->m_voxels[k]->edg[l]->nghbr[0] == NULL || (*m_regions_ref)[j]->m_voxels[k]->edg[l]->nghbr[1] == NULL)
+                    (*m_regions_ref)[j]->m_voxels[k]->edg[l]->external = true;
+                else
+                    if((*m_regions_ref)[j]->m_voxels[k]->edg[l]->nghbr[0]->reg != (*m_regions_ref)[j]->m_voxels[k]->edg[l]->nghbr[1]->reg)
+                        (*m_regions_ref)[j]->m_voxels[k]->edg[l]->external = true;
+            }
+        
     }
+    
 }
 
 void ContGen::traceContours()
@@ -422,7 +468,7 @@ void ContGen::extractContourVertex()
         {
             Edge * tmpEdge = m_contours[i]->m_cntrE[j];
             Vertex * vert = NULL;
-            
+            //vert = tmpEdge->vertex[0];
             ///////////////////////////////////////////////////////////////////////Cheeky little bug
             //find which edge verts to keep
             if(tmpEdge->nghbr[1] == NULL)
