@@ -4,6 +4,7 @@
 #include "Vertex.h"
 namespace deway
 {
+    class Vertex;
     class Contour;
     class Edge;
     class Region;
@@ -13,6 +14,7 @@ namespace deway
     public:
         std::vector<Region*> * m_regions_ref;
         std::vector<Edge*> m_edge;
+        std::vector<Vertex*> m_vertex; 
         std::vector<Contour*> m_contours;
         ContGen(std::vector<Region*> * _regions);
         ~ContGen();

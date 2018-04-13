@@ -75,7 +75,7 @@ World_0::World_0(Core * _core) : World(_core)
         0.2f, //voxel size
         0.8f, //max slope incline
         2.0f, //agent height
-        1.0f//max step height
+        2.0f//max step height
         );
     
     
@@ -171,7 +171,7 @@ World_0::World_0(Core * _core) : World(_core)
 //     refEntity->addComponent(new Render(m_core->m_contour, m_core->m_shaderMinimal, NULL, RenderMode::WIRE));
     
     //CONTOUR VISUALS
-    for(uint j = 0; j<nmgen.m_contGen->m_contours.size(); j++)
+        for(uint j = 0; j<nmgen.m_contGen->m_contours.size(); j++)
     {
         std::vector<deway::Vertex*> & verts = nmgen.m_contGen->m_contours[j]->m_reducedVerts;
         for(uint i = 0; i < verts.size(); i++)
@@ -182,6 +182,32 @@ World_0::World_0(Core * _core) : World(_core)
                 m_core->m_contour->addLine(verts[i]->pos, verts[i+1]->pos);
         }
     }
+    
+    
+//     for(uint j = 2; j</*nmgen.m_contGen->m_contours.size()*/3; j++)
+//     {
+//         std::vector<deway::Vertex*> & verts = nmgen.m_contGen->m_contours[j]->m_verts;
+//         for(uint i = 0; i < verts.size(); i++)
+//         {
+//             if(i == (verts.size()-1))
+//                 m_core->m_contour->addLine(verts[i]->pos, verts[0]->pos);
+//             else
+//                 m_core->m_contour->addLine(verts[i]->pos, verts[i+1]->pos);
+//         }
+//     }
+//     m_core->m_contour->gen();
+//     
+//     for(uint j = 9; j</*nmgen.m_contGen->m_contours.size()*/10; j++)
+//     {
+//         std::vector<deway::Vertex*> & verts = nmgen.m_contGen->m_contours[j]->m_verts;
+//         for(uint i = 0; i < verts.size(); i++)
+//         {
+//             if(i == (verts.size()-1))
+//                 m_core->m_contour->addLine(verts[i]->pos, verts[0]->pos);
+//             else
+//                 m_core->m_contour->addLine(verts[i]->pos, verts[i+1]->pos);
+//         }
+//     }
     m_core->m_contour->gen();
     
     

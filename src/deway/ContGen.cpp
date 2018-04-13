@@ -34,6 +34,10 @@ void ContGen::genEdges()
         for(uint j = 0; j<r->m_voxels.size(); j++)
         {
             Voxel * v = r->m_voxels[j];
+            Vertex * topLeft = NULL;
+            Vertex * topRight = NULL;
+            Vertex * botLeft = NULL;
+            Vertex * botRight = NULL;
             
             //UP EDGE
             if(v->up != NULL)
@@ -42,40 +46,214 @@ void ContGen::genEdges()
                  {
                      v->up_e = v->up->down_e;
                      v->up_e->nghbr[1] = v;
+                     
+                     topLeft = v->up->down_e->vertex[1];
+                     topRight = v->up->down_e->vertex[0];
                  }
             }
             if(v->up_e == NULL)
-            {
-                v->up_e = new Edge();
-                v->up_e->creator = v;
-                v->up_e->nghbr[0] = v;
+            {                
+                //find topLeft///////////////////////////////////
+                //upper neighbour
+                if(v->up != NULL)
+                {
+                    if(v->up->down_e != NULL)
+                        topLeft = v->up->down_e->vertex[1];
+                    if(v->up->left_e != NULL)
+                        topLeft = v->up->left_e->vertex[0];
+                }
+                //top left neighbour
+                if(v->up_left != NULL)
+                {
+                    if(v->up_left->down_e != NULL)
+                        topLeft = v->up_left->down_e->vertex[0];
+                    if(v->up_left->right_e != NULL)
+                        topLeft = v->up_left->right_e->vertex[1];
+                }
+                //left neighbour
+                if(v->left != NULL)
+                {
+                    if(v->left->up_e != NULL)
+                        topLeft = v->left->up_e->vertex[1];
+                    if(v->left->right_e != NULL)
+                        topLeft = v->left->right_e->vertex[0];
+                }
                 
-                v->up_e->v[0] = v->aabb->c + kep::Vector3(-v->aabb->hs.x, v->aabb->hs.y, v->aabb->hs.z);
-                v->up_e->v[1] = v->aabb->c + kep::Vector3(v->aabb->hs.x, v->aabb->hs.y, v->aabb->hs.z);
+                //Create a new vertex as it does not exist
+                if(topLeft == NULL)
+                {
+                    topLeft = new Vertex();
+                    topLeft->pos = v->aabb->c + kep::Vector3(v->aabb->hs.x, v->aabb->hs.y, v->aabb->hs.z);
+                    
+                    //Compare Y values with neighbour voxels and set vertex y values to the largest one
+                    int v0_cl[3] = {0,1,2};
+                    for(uint l = 0; l<3; l++)
+                        if(v->nghbr[v0_cl[l]] != NULL)
+                        {
+                            float nu_y = (v->nghbr[v0_cl[l]]->aabb->c.y + v->nghbr[v0_cl[l]]->aabb->hs.y);
+                            if(nu_y > topLeft->pos.y)
+                                topLeft->pos.y = nu_y;
+                        }
+                    m_vertex.push_back(topLeft);
+                }
                 
-                //Compare Y values with neighbour voxels and set vertex y values to the largest one
-                //V0
-                int v0_cl[3] = {0,7,6};
-                for(uint l = 0; l<3; l++)
-                    if(v->nghbr[v0_cl[l]] != NULL)
-                    {
-                        float nu_y = (v->nghbr[v0_cl[l]]->aabb->c.y + v->nghbr[v0_cl[l]]->aabb->hs.y);
-                        if(nu_y > v->up_e->v[0].y)
-                            v->up_e->v[0].y = nu_y;
-                    }
+                //find topRight///////////////////////////////////
+                //upper neighbour
+                if(v->up != NULL)
+                {
+                    if(v->up->down_e != NULL)
+                        topRight = v->up->down_e->vertex[0];
+                    if(v->up->right_e != NULL)
+                        topRight = v->up->right_e->vertex[1];
+                }
+                //top right neighbour
+                if(v->up_right != NULL)
+                {
+                    if(v->up_right->left_e != NULL)
+                        topRight = v->up_right->left_e->vertex[0];
+                    if(v->up_right->down_e != NULL)
+                        topRight = v->up_right->down_e->vertex[1];
+                }
+                //right neighbour
+                if(v->right != NULL)
+                {
+                    if(v->right->up_e != NULL)
+                        topRight = v->right->up_e->vertex[0];
+                    if(v->right->left_e != NULL)
+                        topRight = v->right->left_e->vertex[1];
+                }
+                if(topRight == NULL)
+                {
+                    topRight = new Vertex();
+                    topRight->pos = v->aabb->c + kep::Vector3(-v->aabb->hs.x, v->aabb->hs.y, v->aabb->hs.z);
+                    
+                    int v1_cl[3] = {0,7,6};
+                    for(uint l = 0; l<3; l++)
+                        if(v->nghbr[v1_cl[l]] != NULL)
+                        {
+                            float nu_y = (v->nghbr[v1_cl[l]]->aabb->c.y + v->nghbr[v1_cl[l]]->aabb->hs.y);
+                            if(nu_y > topRight->pos.y)
+                                topRight->pos.y = nu_y;
+                        }
+                    m_vertex.push_back(topRight);
+                }
                 
-                int v1_cl[3] = {0,1,2};
-                for(uint l = 0; l<3; l++)
-                    if(v->nghbr[v1_cl[l]] != NULL)
-                    {
-                        float nu_y = (v->nghbr[v1_cl[l]]->aabb->c.y + v->nghbr[v1_cl[l]]->aabb->hs.y);
-                        if(nu_y > v->up_e->v[1].y)
-                            v->up_e->v[1].y = nu_y;
-                    }
+            
+                Edge * edge = new Edge();
+                edge->vertex[0] = topLeft;
+                edge->vertex[1] = topRight;
                 
+                edge->nghbr[0] = v;
                 
-                m_edge.push_back(v->up_e);
+                m_edge.push_back(edge);
+                v->up_e = edge;
             }
+            
+            /////////////////////////////////////////////////////////////////////
+            
+            //DOWN EDGE
+            if(v->down != NULL)
+            {
+                if(v->down->up_e != NULL)
+                {
+                    v->down_e = v->down->up_e;
+                    v->down_e->nghbr[1] = v;
+                    
+                    botLeft = v->down->up_e->vertex[0];
+                    botRight = v->down->up_e->vertex[1];
+                }
+            }
+            if(v->down_e == NULL)
+            {
+                //find botLeft///////////////////////////////////
+                if(v->down != NULL)
+                {
+                    if(v->down->up_e != NULL)
+                        botLeft = v->down->up_e->vertex[0];
+                    if(v->down->left_e != NULL)
+                        botLeft = v->down->left_e->vertex[1];
+                }
+                if(v->down_left != NULL)
+                {
+                    if(v->down_left->up_e != NULL)
+                        botLeft = v->down_left->up_e->vertex[1];
+                    if(v->down_left->right_e != NULL)
+                        botLeft = v->down_left->right_e->vertex[0];
+                }
+                if(v->left != NULL)
+                {
+                    if(v->left->down_e != NULL)
+                        botLeft = v->left->down_e->vertex[0];
+                    if(v->left->right_e != NULL)
+                        botLeft = v->left->right_e->vertex[1];
+                }
+                if(botLeft == NULL)
+                {
+                    botLeft = new Vertex();
+                    botLeft->pos = v->aabb->c + kep::Vector3(v->aabb->hs.x, v->aabb->hs.y, -v->aabb->hs.z);
+                    
+                    //Compare Y values with neighbour voxels and set vertex y values to the largest one
+                    int v0_cl[3] = {2,3,4};
+                    for(uint l = 0; l<3; l++)
+                        if(v->nghbr[v0_cl[l]] != NULL)
+                        {
+                            float nu_y = (v->nghbr[v0_cl[l]]->aabb->c.y + v->nghbr[v0_cl[l]]->aabb->hs.y);
+                            if(nu_y > botLeft->pos.y)
+                                botLeft->pos.y = nu_y;
+                        }
+                        m_vertex.push_back(botLeft);
+                }
+                
+                //find botRight///////////////////////////////////
+                if(v->down != NULL)
+                {
+                    if(v->down->up_e != NULL)
+                        botRight = v->down->up_e->vertex[1];
+                    if(v->down->right_e != NULL)
+                        botRight = v->down->right_e->vertex[0];
+                }
+                if(v->down_right != NULL)
+                {
+                    if(v->down_right->up_e != NULL)
+                        botRight = v->down_right->up_e->vertex[0];
+                    if(v->down_right->left_e != NULL)
+                        botRight = v->down_right->left_e->vertex[1];
+                }
+                if(v->right != NULL)
+                {
+                    if(v->right->left_e != NULL)
+                        botRight = v->right->left_e->vertex[0];
+                    if(v->right->down_e != NULL)
+                        botRight = v->right->down_e->vertex[1];
+                }
+                if(botRight == NULL)
+                {
+                    botRight = new Vertex();
+                    botRight->pos = v->aabb->c + kep::Vector3(-v->aabb->hs.x, v->aabb->hs.y, -v->aabb->hs.z);
+                    
+                    int v1_cl[3] = {4,5,6};
+                    for(uint l = 0; l<3; l++)
+                        if(v->nghbr[v1_cl[l]] != NULL)
+                        {
+                            float nu_y = (v->nghbr[v1_cl[l]]->aabb->c.y + v->nghbr[v1_cl[l]]->aabb->hs.y);
+                            if(nu_y > botRight->pos.y)
+                                botRight->pos.y = nu_y;
+                        }
+                        m_vertex.push_back(botRight);
+                    
+                }
+                
+                Edge * edge = new Edge();
+                edge->vertex[0] = botRight;
+                edge->vertex[1] = botLeft;
+                
+                edge->nghbr[0] = v;
+                
+                m_edge.push_back(edge);
+                v->down_e = edge;
+                
+            }
+            
             /////////////////////////////////////////////////////////////////////
             
              //LEFT EDGE
@@ -89,81 +267,16 @@ void ContGen::genEdges()
             }
             if(v->left_e == NULL)
             {
-                v->left_e = new Edge();
-                v->left_e->creator = v;
-                v->left_e->nghbr[0] = v;
+                Edge * edge = new Edge();
+                edge->vertex[0] = botLeft;
+                edge->vertex[1] = topLeft;
                 
-                v->left_e->v[0] = v->aabb->c + kep::Vector3(v->aabb->hs.x, v->aabb->hs.y, v->aabb->hs.z);
-                v->left_e->v[1] = v->aabb->c + kep::Vector3(v->aabb->hs.x, v->aabb->hs.y, -v->aabb->hs.z);
+                edge->nghbr[0] = v;
                 
-                //Compare Y values with neighbour voxels and set vertex y values to the largest one
-                //V0
-                int v0_cl[3] = {0,1,2};
-                for(uint l = 0; l<3; l++)
-                    if(v->nghbr[v0_cl[l]] != NULL)
-                    {
-                        float nu_y = (v->nghbr[v0_cl[l]]->aabb->c.y + v->nghbr[v0_cl[l]]->aabb->hs.y);
-                        if(nu_y > v->left_e->v[0].y)
-                            v->left_e->v[0].y = nu_y;
-                    }
-                
-                int v1_cl[3] = {2,3,4};
-                for(uint l = 0; l<3; l++)
-                    if(v->nghbr[v1_cl[l]] != NULL)
-                    {
-                        float nu_y = (v->nghbr[v1_cl[l]]->aabb->c.y + v->nghbr[v1_cl[l]]->aabb->hs.y);
-                        if(nu_y > v->left_e->v[1].y)
-                            v->left_e->v[1].y = nu_y;
-                    }
-                
-                
-                
-                m_edge.push_back(v->left_e);
+                m_edge.push_back(edge);
+                v->left_e = edge;
             }
-            /////////////////////////////////////////////////////////////////////
-            
-            //DOWN EDGE
-            if(v->down != NULL)
-            {
-                if(v->down->up_e != NULL)
-                {
-                    v->down_e = v->down->up_e;
-                    v->down_e->nghbr[1] = v;
-                }
-            }
-            if(v->down_e == NULL)
-            {
-                v->down_e = new Edge();
-                v->down_e->creator = v;
-                v->down_e->nghbr[0] = v;
-                
-                v->down_e->v[0] = v->aabb->c + kep::Vector3(v->aabb->hs.x, v->aabb->hs.y, -v->aabb->hs.z);
-                v->down_e->v[1] = v->aabb->c + kep::Vector3(-v->aabb->hs.x, v->aabb->hs.y, -v->aabb->hs.z);
-                
-                //Compare Y values with neighbour voxels and set vertex y values to the largest one
-                //V0
-                int v0_cl[3] = {2,3,4};
-                for(uint l = 0; l<3; l++)
-                    if(v->nghbr[v0_cl[l]] != NULL)
-                    {
-                        float nu_y = (v->nghbr[v0_cl[l]]->aabb->c.y + v->nghbr[v0_cl[l]]->aabb->hs.y);
-                        if(nu_y > v->down_e->v[0].y)
-                            v->down_e->v[0].y = nu_y;
-                    }
-                
-                int v1_cl[3] = {4,5,6};
-                for(uint l = 0; l<3; l++)
-                    if(v->nghbr[v1_cl[l]] != NULL)
-                    {
-                        float nu_y = (v->nghbr[v1_cl[l]]->aabb->c.y + v->nghbr[v1_cl[l]]->aabb->hs.y);
-                        if(nu_y > v->down_e->v[1].y)
-                            v->down_e->v[1].y = nu_y;
-                    }
-                
-                
-                
-                m_edge.push_back(v->down_e);
-            }
+
             /////////////////////////////////////////////////////////////////////
             
             //RIGHT EDGE
@@ -177,36 +290,14 @@ void ContGen::genEdges()
             }
             if(v->right_e == NULL)
             {
-                v->right_e = new Edge();
-                v->right_e->creator = v;
-                v->right_e->nghbr[0] = v;
+                Edge * edge = new Edge();
+                edge->vertex[0] = topRight;
+                edge->vertex[1] = botRight;
                 
-                v->right_e->v[0] = v->aabb->c + kep::Vector3(-v->aabb->hs.x, v->aabb->hs.y, -v->aabb->hs.z);
-                v->right_e->v[1] = v->aabb->c + kep::Vector3(-v->aabb->hs.x, v->aabb->hs.y, v->aabb->hs.z);
+                edge->nghbr[0] = v;
                 
-                //Compare Y values with neighbour voxels and set vertex y values to the largest one
-                //V0
-                int v0_cl[3] = {4,5,6};
-                for(uint l = 0; l<3; l++)
-                    if(v->nghbr[v0_cl[l]] != NULL)
-                    {
-                        float nu_y = (v->nghbr[v0_cl[l]]->aabb->c.y + v->nghbr[v0_cl[l]]->aabb->hs.y);
-                        if(nu_y > v->right_e->v[0].y)
-                            v->right_e->v[0].y = nu_y;
-                    }
-                
-                int v1_cl[3] = {0,7,6};
-                for(uint l = 0; l<3; l++)
-                    if(v->nghbr[v1_cl[l]] != NULL)
-                    {
-                        float nu_y = (v->nghbr[v1_cl[l]]->aabb->c.y + v->nghbr[v1_cl[l]]->aabb->hs.y);
-                        if(nu_y > v->right_e->v[1].y)
-                            v->right_e->v[1].y = nu_y;
-                    }
-                
-                
-                
-                m_edge.push_back(v->right_e);
+                m_edge.push_back(edge);
+                v->right_e = edge;
             }
             /////////////////////////////////////////////////////////////////////
             
@@ -330,28 +421,31 @@ void ContGen::extractContourVertex()
         for(uint j = 0; j<m_contours[i]->m_cntrE.size(); j++)
         {
             Edge * tmpEdge = m_contours[i]->m_cntrE[j];
-            Vertex * vert = new Vertex();
-            
+            Vertex * vert = NULL;
             
             ///////////////////////////////////////////////////////////////////////Cheeky little bug
-            //find which vertex edge vertex to keep
-            if(tmpEdge->nghbr[0] == NULL || tmpEdge->nghbr[1] == NULL)
-                vert->pos = tmpEdge->v[0];
+            //find which edge verts to keep
+            if(tmpEdge->nghbr[1] == NULL)
+            {
+                vert = tmpEdge->vertex[1];
+            }
             else
-                for(uint n = 0 ; n<2; n++)
-                    if(tmpEdge->nghbr[n]->reg == m_contours[i]->reg)//which voxel does the edge get traced from
+            {
+                    if(tmpEdge->nghbr[0]->reg == m_contours[i]->reg)//which voxel does the edge get traced from
                     {
-                        if(tmpEdge->nghbr[n] == tmpEdge->creator)//did this voxel initialised the edge
-                            vert->pos = tmpEdge->v[0];
-                        else
-                            vert->pos = tmpEdge->v[1];
-                        break;
+                            vert = tmpEdge->vertex[1];
                     }
+                    else if(tmpEdge->nghbr[1]->reg == m_contours[i]->reg)//which voxel does the edge get traced from
+                    {
+
+                            vert = tmpEdge->vertex[0];
+                    }
+            }
             /////////////////////////////////////////////////////////////////////////////////////////
            
             //find NULL regions
-            void * currentRegs[2] = {NULL,NULL};
-            void * prevRegs[2] = {NULL,NULL};
+            Region* currentRegs[2] = {NULL,NULL};
+            Region * prevRegs[2] = {NULL,NULL};
             
             for(uint k = 0; k<2; k++)
             {
@@ -407,8 +501,6 @@ void ContGen::extractContourVertex()
         
     }
     
-    //printf("num edg: %d \n", m_contours[0]->m_cntrE.size());
-    //printf("numvert: %d \n", m_contours[0]->m_cntrV.size());
 }
 
 

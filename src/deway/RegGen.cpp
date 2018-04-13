@@ -199,7 +199,7 @@ void RegGen::filterWrappingCorners()
 {
     uint numFilter = 2; //CONFIG PARAMETER
     ///////////////////////////////////////
-    //scan all voxels and assgin then to region which it has more connections to
+    //scan all voxels and assgin them to region which it has more connections to
     for(uint nk = 0; nk <numFilter; nk ++)
         for(uint i = 0; i<m_regions.size(); i++)
         {

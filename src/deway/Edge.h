@@ -4,14 +4,15 @@
 #include "../kep/Core.h"
 namespace deway 
 {
+    class Vertex;
     class Voxel;
     class Edge 
     {
     public:
         bool external;//to flag as external edge
-        kep::Vector3 v[2];
+        //kep::Vector3 v[2];
         Voxel * nghbr[2];
-        Voxel * creator;//stores memory location of the voxels which initialised this edge
+        Vertex * vertex[2];
         Edge();
         ~Edge();
     };
