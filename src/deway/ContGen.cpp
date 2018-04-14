@@ -24,6 +24,9 @@ ContGen::~ContGen()
     
     for(uint i = 0; i<m_contours.size(); i++)
         delete m_contours[i];
+    
+    for(uint i = 0; i<m_vertex.size(); i++)
+        delete m_vertex[i];
 }
 
 void ContGen::genEdges()
@@ -338,32 +341,14 @@ void ContGen::genEdges()
 void ContGen::flagExtEdges()
 {
     //flag external regions
-//     for(uint i = 0; i < m_edge.size(); i++)
-//     {
-//         if(m_edge[i]->nghbr[0] == NULL || m_edge[i]->nghbr[1] == NULL)
-//             m_edge[i]->external = true;
-//          else
-//              if(m_edge[i]->nghbr[0]->reg != m_edge[i]->nghbr[1]->reg)
-//                  m_edge[i]->external = true;
-//     }
-    
-    
-    for(uint j = 0; j<m_regions_ref->size(); j++)
+    for(uint i = 0; i < m_edge.size(); i++)
     {
-        for(uint k = 0; k<(*m_regions_ref)[j]->m_voxels.size(); k++)
-            for(uint l = 0; l<4; l++)
-            {
-                //(*m_regions_ref)[j]->m_voxels[k]->edg[l];
-                
-                if((*m_regions_ref)[j]->m_voxels[k]->edg[l]->nghbr[0] == NULL || (*m_regions_ref)[j]->m_voxels[k]->edg[l]->nghbr[1] == NULL)
-                    (*m_regions_ref)[j]->m_voxels[k]->edg[l]->external = true;
-                else
-                    if((*m_regions_ref)[j]->m_voxels[k]->edg[l]->nghbr[0]->reg != (*m_regions_ref)[j]->m_voxels[k]->edg[l]->nghbr[1]->reg)
-                        (*m_regions_ref)[j]->m_voxels[k]->edg[l]->external = true;
-            }
-        
+        if(m_edge[i]->nghbr[0] == NULL || m_edge[i]->nghbr[1] == NULL)
+            m_edge[i]->external = true;
+         else
+             if(m_edge[i]->nghbr[0]->reg != m_edge[i]->nghbr[1]->reg)
+                 m_edge[i]->external = true;
     }
-    
 }
 
 void ContGen::traceContours()
@@ -640,7 +625,7 @@ void ContGen::RDP_simp(std::vector<Vertex*> * _segment, float _tollerance, uint 
 void ContGen::reduceVerts() 
 {
     //CONFIG PARAMS
-    float tollerance = 0.7f;
+    float tollerance = 1.0f;
     //////////////////
     
     //Apply vertex reduction algorithm to each segment

@@ -3,6 +3,8 @@
 #include "AABB.h"
 #include "RegGen.h"
 #include "ContGen.h"
+#include "PolyGen.h"
+
 using namespace deway;
 #define EXEC_TIMER(o_timeElapsed, _expr) \
 {\
@@ -90,6 +92,7 @@ NMGen::NMGen(float * _vertexData, float * _normalData, uint _numVertex, uint _vo
     calcEdgeDistances();
     genRegions();
     genContours();
+    genPolygons();
     
     
 }
@@ -100,6 +103,7 @@ NMGen::~NMGen()
     delete[] m_spans;
     delete m_regGen;
     delete m_contGen;
+    delete m_polyGen;
 }
 
 void NMGen::genSpans()
@@ -463,6 +467,10 @@ void NMGen::genRegions()
 void NMGen::genContours()
 {
     m_contGen = new ContGen(&m_regGen->m_regions);
+}
+void NMGen::genPolygons()
+{
+    m_polyGen = new PolyGen(&m_contGen->m_contours);
 }
 
 

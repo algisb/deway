@@ -26,7 +26,7 @@ Core::Core(int _argc, char ** _argv)
     m_cubeMesh = new MeshLoad("./models/cube.obj", "./models/");
     m_monkeyMesh = new MeshLoad("./models/monkey.obj", "./models/");
     m_dungeon = new MeshLoad("./models/dungeon.obj", "./models/");
-    m_sandBox = new MeshLoad("./models/nav_test.obj", "./models/");//nav_test.obj
+    m_sandBox = new MeshLoad("./models/sandbox.obj", "./models/");//nav_test.obj
     m_triangleMesh = new MeshGen();
     m_voxelVolumeMesh = new MeshGenLine();
     m_voxelVolumeOutlineMesh = new MeshGenLine();

@@ -11,6 +11,7 @@ namespace deway
 { 
     class ContGen;
     class RegGen;
+    class PolyGen;
     class NMGen
     {
     public:
@@ -42,7 +43,7 @@ namespace deway
         
         RegGen * m_regGen; //region generator
         ContGen * m_contGen; //contour generator
-        
+        PolyGen * m_polyGen; //polygon generator
         
         
         NMGen(float * _vertexData, float * _normalData, uint _numVertex, uint _volX, uint _volY, uint _volZ, kep::Vector3 _offset, bool _autoSizeVolume, float _voxelSize,float _maxSlope, float _agentHeight, float _maxStepHeight);
@@ -87,6 +88,7 @@ namespace deway
         void calcEdgeDistances();
         void genRegions();
         void genContours();
+        void genPolygons();
     };
 };
 
