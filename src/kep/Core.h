@@ -66,6 +66,25 @@ namespace kep
         void dump();
     };
     
+    class Vector4
+    {
+    public:
+        union
+        {
+            real data[4];
+            struct
+            {
+                real x;
+                real y;
+                real z;
+                real w;
+            };
+        };
+        
+        Vector4(): x(0) , y(0), z(0), w(0){}
+        Vector4(real _x, real _y, real _z, real _w) : x(_x), y(_y), z(_z), w(_w){}
+        ~Vector4(){}
+    };
     class Quaternion
     {
     public:

@@ -8,7 +8,7 @@
 
 using namespace kelp;
 
-Render::Render(Mesh * _mesh, Shader * _shader, Texture * _texture, RenderMode _renderMode, kep::Vector3 _colour, bool _disableDepth) : Component()
+Render::Render(Mesh * _mesh, Shader * _shader, Texture * _texture, RenderMode _renderMode, kep::Vector4 _colour, bool _disableDepth) : Component()
 {
     m_mesh = _mesh;
     m_shader = _shader;
@@ -48,7 +48,7 @@ void Render::render()
                        GL_FALSE, &rc->m_viewMat.d[0][0]);
     glUniformMatrix4fv(m_shader->m_shaderProjMatLocation, 1, 
                        GL_FALSE, &rc->m_projectionMat.d[0][0]);
-    glUniform3fv(m_shader->m_shaderColourLocation, 1, m_colour.data);
+    glUniform4fv(m_shader->m_shaderColourLocation, 1, m_colour.data);
     
     glUniform1i(m_shader->m_shaderText1SamplerLocation, 0);
     glActiveTexture(GL_TEXTURE0);

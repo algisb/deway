@@ -2,6 +2,7 @@
 #define CONTGEN_H_
 #include <vector>
 #include "Vertex.h"
+#include "typedefs.h"
 namespace deway
 {
     class Vertex;

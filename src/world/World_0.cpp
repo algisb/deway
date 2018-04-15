@@ -206,30 +206,6 @@ World_0::World_0(Core * _core) : World(_core)
                 m_core->m_contour->addLine(verts[i]->pos, verts[i+1]->pos);
         }
     }
-    
-    
-//     for(uint j = 2; j</*nmgen.m_contGen->m_contours.size()*/3; j++)
-//     {
-//         std::vector<deway::Vertex*> & verts = nmgen.m_contGen->m_contours[j]->m_verts;
-//         for(uint i = 0; i < verts.size(); i++)
-//         {
-//             if(i == (verts.size()-1))
-//                 m_core->m_contour->addLine(verts[i]->pos, verts[0]->pos);
-//             else
-//                 m_core->m_contour->addLine(verts[i]->pos, verts[i+1]->pos);
-//         }
-//     }
-//     for(uint j = 9; j</*nmgen.m_contGen->m_contours.size()*/10; j++)
-//     {
-//         std::vector<deway::Vertex*> & verts = nmgen.m_contGen->m_contours[j]->m_verts;
-//         for(uint i = 0; i < verts.size(); i++)
-//         {
-//             if(i == (verts.size()-1))
-//                 m_core->m_contour->addLine(verts[i]->pos, verts[0]->pos);
-//             else
-//                 m_core->m_contour->addLine(verts[i]->pos, verts[i+1]->pos);
-//         }
-//     }
     m_core->m_contour->gen();
     
     
@@ -240,6 +216,27 @@ World_0::World_0(Core * _core) : World(_core)
                                         kep::Vector3(1.0f, 1.0f, 1.0f)
                                         ));
     refEntity->addComponent(new Render(m_core->m_contour, m_core->m_shaderMinimal, NULL, RenderMode::WIRE));
+    
+    
+    //NAV-MESH VISUALS
+    
+    m_core->m_navMesh->addTri(kep::Vector3(3.0f, 5.0f, 6.0f), kep::Vector3(0.0f, 9.0f, -5.0f), kep::Vector3(-6.0f, 4.0f, 8.0f));
+    m_core->m_navMesh->gen();
+    
+    refEntity = new Entity(this, "navMesh");
+    refTransform = (Transform*)refEntity->addComponent(new Transform(
+                                        kep::Vector3(0.0f, 0.0f, 0.0f),
+                                        kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
+                                        kep::Vector3(1.0f, 1.0f, 1.0f)
+                                        ));
+    refEntity->addComponent(new Render(m_core->m_navMesh, m_core->m_shaderMinimal, NULL, RenderMode::SOLID, kep::Vector4(0.0f, 1.0f, 0.0f, 0.1f)));
+    refEntity = new Entity(this, "navMesh edges");
+    refTransform = (Transform*)refEntity->addComponent(new Transform(
+                                        kep::Vector3(0.0f, 0.0f, 0.0f),
+                                        kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
+                                        kep::Vector3(1.0f, 1.0f, 1.0f)
+                                        ));
+    refEntity->addComponent(new Render(m_core->m_navMesh, m_core->m_shaderMinimal, NULL, RenderMode::WIRE, kep::Vector4(0.0f, 1.0f, 0.0f, 1.0f)));
     
     
     //SEGMENT VISUALS

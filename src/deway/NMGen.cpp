@@ -3,7 +3,7 @@
 #include "AABB.h"
 #include "RegGen.h"
 #include "ContGen.h"
-#include "PolyGen.h"
+#include "TriGen.h"
 
 using namespace deway;
 #define EXEC_TIMER(o_timeElapsed, _expr) \
@@ -103,7 +103,7 @@ NMGen::~NMGen()
     delete[] m_spans;
     delete m_regGen;
     delete m_contGen;
-    delete m_polyGen;
+    delete m_triGen;
 }
 
 void NMGen::genSpans()
@@ -470,7 +470,7 @@ void NMGen::genContours()
 }
 void NMGen::genPolygons()
 {
-    m_polyGen = new PolyGen(&m_contGen->m_contours);
+    m_triGen = new TriGen(&m_contGen->m_contours);
 }
 
 

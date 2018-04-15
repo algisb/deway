@@ -19,7 +19,6 @@ namespace deway
         
         Contour();
         ~Contour();
-        void extratVertexData();
     };
 };
 

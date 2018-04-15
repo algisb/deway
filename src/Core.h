@@ -50,6 +50,7 @@ namespace kelp
         MeshLoad * m_externalMesh;
         MeshLoad * m_dungeon;
         MeshGenLine * m_contour;
+        MeshGen * m_navMesh;
         
         
         
