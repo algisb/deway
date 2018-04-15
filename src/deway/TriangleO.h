@@ -9,7 +9,7 @@ namespace deway
     {
     public:
         Vertex * vertex[3];
-        TriangleO();
+        TriangleO(Vertex * _v0, Vertex * _v1, Vertex * _v2);
         ~TriangleO();
     };
 };

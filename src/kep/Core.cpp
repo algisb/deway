@@ -119,6 +119,42 @@ void Vector3::dump()
 }
 
 
+void Vector2::operator *=(const real _value)
+{
+    x *= _value;
+    y *= _value;
+}
+Vector2 Vector2::operator *(const real _value)
+{
+    return Vector2(x*_value, y*_value);
+}
+void Vector2::operator +=(const Vector2 & _v)
+{
+    x += _v.x;
+    y += _v.y;
+}
+Vector2 Vector2::operator +(const Vector2 & _v)
+{
+    return Vector2(x + _v.x, y + _v.y);
+}
+void Vector2::operator -=(const Vector2 & _v)
+{
+    x -= _v.x;
+    y -= _v.y;
+}
+Vector2 Vector2::operator -(const Vector2 & _v)
+{
+    return Vector2(x - _v.x, y - _v.y);
+}
+real Vector2::magnitude()
+{
+    return sqrt( x*x + y*y );
+}
+
+
+
+
+
 Quaternion::Quaternion(real _r, real _i, real _j, real _k)
 {
     r = _r;

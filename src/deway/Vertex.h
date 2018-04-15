@@ -8,7 +8,7 @@ namespace deway
     {
     public:
         kep::Vector3 pos;
-        bool locked;
+        bool locked; //used in contour generation stage
         Vertex();
         ~Vertex();
     };

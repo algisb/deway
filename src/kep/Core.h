@@ -85,6 +85,34 @@ namespace kep
         Vector4(real _x, real _y, real _z, real _w) : x(_x), y(_y), z(_z), w(_w){}
         ~Vector4(){}
     };
+    
+    class Vector2
+    {
+    public:
+        union
+        {
+            real data[2];
+            struct
+            {
+                real x;
+                real y;
+            };
+        };
+        
+        Vector2(): x(0) , y(0){}
+        Vector2(real _x, real _y) : x(_x), y(_y){}
+        ~Vector2(){}
+        
+        void operator *=(const real _value);
+        Vector2 operator *(const real _value);
+        void operator +=(const Vector2 & _v);
+        Vector2 operator +(const Vector2 & _v);
+        void operator -=(const Vector2 & _v);
+        Vector2 operator -(const Vector2 & _v);
+        real magnitude();
+    };
+    
+    
     class Quaternion
     {
     public:
@@ -213,6 +241,10 @@ namespace kep
     inline real dot(Vector3 _v0, Vector3 _v1)
     {
         return (_v0.x*_v1.x + _v0.y*_v1.y + _v0.z*_v1.z);
+    }
+    inline real dot(Vector2 _v0, Vector2 _v1)
+    {
+        return (_v0.x*_v1.x + _v0.y*_v1.y);
     }
     inline Vector3 cross(Vector3 _v0, Vector3 _v1)
     {

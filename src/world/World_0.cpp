@@ -17,6 +17,8 @@
 #include "deway/ContGen.h"
 #include "deway/Contour.h"
 #include "deway/Vertex.h"
+#include "deway/TriGen.h"
+#include "deway/TriangleO.h"
 
 using namespace kelp;
 
@@ -220,7 +222,11 @@ World_0::World_0(Core * _core) : World(_core)
     
     //NAV-MESH VISUALS
     
-    m_core->m_navMesh->addTri(kep::Vector3(3.0f, 5.0f, 6.0f), kep::Vector3(0.0f, 9.0f, -5.0f), kep::Vector3(-6.0f, 4.0f, 8.0f));
+    for(uint i = 0; i< nmgen.m_triGen->m_navMesh.size(); i++)
+    {
+        m_core->m_navMesh->addTri(nmgen.m_triGen->m_navMesh[i]->vertex[0]->pos, nmgen.m_triGen->m_navMesh[i]->vertex[1]->pos, nmgen.m_triGen->m_navMesh[i]->vertex[2]->pos);
+    }
+    //m_core->m_navMesh->addTri(kep::Vector3(3.0f, 5.0f, 6.0f), kep::Vector3(0.0f, 9.0f, -5.0f), kep::Vector3(-6.0f, 4.0f, 8.0f));
     m_core->m_navMesh->gen();
     
     refEntity = new Entity(this, "navMesh");
