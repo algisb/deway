@@ -13,6 +13,7 @@ Core::Core(int _argc, char ** _argv)
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LINE_SMOOTH);
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     ///////////////////////////////////////
     //MeshGen * meshGen = new MeshGen();
@@ -26,7 +27,7 @@ Core::Core(int _argc, char ** _argv)
     m_cubeMesh = new MeshLoad("./models/cube.obj", "./models/");
     m_monkeyMesh = new MeshLoad("./models/monkey.obj", "./models/");
     m_dungeon = new MeshLoad("./models/dungeon.obj", "./models/");
-    m_sandBox = new MeshLoad("./models/sandbox.obj", "./models/");//nav_test.obj
+    m_sandBox = new MeshLoad("./models/nav_test.obj", "./models/");//nav_test.obj
     m_triangleMesh = new MeshGen();
     m_voxelVolumeMesh = new MeshGenLine();
     m_voxelVolumeOutlineMesh = new MeshGenLine();

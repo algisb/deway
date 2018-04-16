@@ -15,6 +15,7 @@ namespace deway
         
         TriGen(std::vector<Contour*> * _contours);
         ~TriGen();
+        void earClip();
         void genTriangles();
         
         
