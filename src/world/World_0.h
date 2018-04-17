@@ -12,11 +12,21 @@
 #include "component/Empty.h"
 #include "component/KePhys.h"
 
+namespace deway
+{
+    class NMGen;
+    class PathFinder;
+};
+
 namespace kelp
 {
+    
     class World_0 : public World
     {
     public:
+        deway::NMGen * nmgen;
+        deway::PathFinder * pathFinder;
+        
         Entity * empty[10];
         
         Entity * wall;

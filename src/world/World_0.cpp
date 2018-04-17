@@ -19,6 +19,7 @@
 #include "deway/Vertex.h"
 #include "deway/TriGen.h"
 #include "deway/TriangleO.h"
+#include "deway/pathfinder/PathFinder.h"
 
 using namespace kelp;
 
@@ -53,10 +54,11 @@ World_0::World_0(Core * _core) : World(_core)
     
    /////////////////////////////////////////////////////////////////////////
     
-    //TEST TRIANGLE
     
+    //NAV-MESH SOURCE MESH
     Mesh * polySoup = /*m_core->m_triangleMesh;*/m_core->m_sandBox; //<----------------------------------------------------
     
+    //TEST TRIANGLE
     m_core->m_triangleMesh->addTri(kep::Vector3(3.0f, 5.0f, 6.0f), kep::Vector3(0.0f, 9.0f, -5.0f), kep::Vector3(-6.0f, 4.0f, 8.0f));
     m_core->m_triangleMesh->gen();
     
@@ -68,9 +70,8 @@ World_0::World_0(Core * _core) : World(_core)
                                         ));
     refEntity->addComponent(new Render(polySoup, m_core->m_shaderDefault, NULL, RenderMode::SOLID));
     
-    //GENERATOR
-    
-    deway::NMGen nmgen(polySoup->m_dataV, polySoup->m_dataN, polySoup->m_numVertices,
+    //NAV-MESH GENERATOR
+    nmgen = new deway::NMGen(polySoup->m_dataV, polySoup->m_dataN, polySoup->m_numVertices,
         80, 30, 80, //volume dimensions
         kep::Vector3(0.0f, 5.0f, 0.0f), //volume offset
         true, //auto size the volume
@@ -81,12 +82,17 @@ World_0::World_0(Core * _core) : World(_core)
         );
     
     
-    m_core->m_voxelVolumeOutlineMesh->addBox(kep::Vector3(nmgen.m_offset.x, 
-                                                          nmgen.m_offset.y, 
-                                                          nmgen.m_offset.z), 
-                                             kep::Vector3(nmgen.m_volX * nmgen.m_voxelSize,
-                                                          nmgen.m_volY * nmgen.m_voxelSize,
-                                                          nmgen.m_volZ * nmgen.m_voxelSize));
+    //PATHFINDER
+    pathFinder = new deway::PathFinder(&nmgen->m_triGen->m_navMesh);
+    
+    
+    
+    m_core->m_voxelVolumeOutlineMesh->addBox(kep::Vector3(nmgen->m_offset.x, 
+                                                          nmgen->m_offset.y, 
+                                                          nmgen->m_offset.z), 
+                                             kep::Vector3(nmgen->m_volX * nmgen->m_voxelSize,
+                                                          nmgen->m_volY * nmgen->m_voxelSize,
+                                                          nmgen->m_volZ * nmgen->m_voxelSize));
     m_core->m_voxelVolumeOutlineMesh->gen();
     
     
@@ -103,23 +109,23 @@ World_0::World_0(Core * _core) : World(_core)
     
 //     //SINGLE VOXEL VISUALS
 //     srand(time(NULL));
-//     int rID = rand() % nmgen.m_numTravVoxels;
+//     int rID = rand() % nmgen->m_numTravVoxels;
 //     printf("rID: %u \n", rID-1);
 //     
 //     refEntity = new Entity(this, "quad");
 //     refTransform = (Transform*)refEntity->addComponent(new Transform(
-//                                         kep::Vector3(nmgen.m_travVoxels[rID]->aabb->c.x, nmgen.m_travVoxels[rID]->aabb->c.y + nmgen.m_voxelSize, nmgen.m_travVoxels[rID]->aabb->c.z),
+//                                         kep::Vector3(nmgen->m_travVoxels[rID]->aabb->c.x, nmgen->m_travVoxels[rID]->aabb->c.y + nmgen->m_voxelSize, nmgen->m_travVoxels[rID]->aabb->c.z),
 //                                         kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
-//                                         kep::Vector3(nmgen.m_voxelSize, nmgen.m_voxelSize, nmgen.m_voxelSize)
+//                                         kep::Vector3(nmgen->m_voxelSize, nmgen->m_voxelSize, nmgen->m_voxelSize)
 //                                         ));
 //     refEntity->addComponent(new Render(m_core->m_plane, m_core->m_shaderMinimal ,NULL, RenderMode::SOLID, kep::Vector3(0.0f, 0.0f, 0.0f)));
 //     for(int i = 0; i<3; i=i+1)
 //     {
 //         refEntity = new Entity(this, "quad");
 //         refTransform = (Transform*)refEntity->addComponent(new Transform(
-//                                             kep::Vector3(nmgen.m_travVoxels[rID]->nghbr[i]->aabb->c.x, nmgen.m_travVoxels[rID]->nghbr[i]->aabb->c.y + nmgen.m_voxelSize, nmgen.m_travVoxels[rID]->nghbr[i]->aabb->c.z),
+//                                             kep::Vector3(nmgen->m_travVoxels[rID]->nghbr[i]->aabb->c.x, nmgen->m_travVoxels[rID]->nghbr[i]->aabb->c.y + nmgen->m_voxelSize, nmgen->m_travVoxels[rID]->nghbr[i]->aabb->c.z),
 //                                             kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
-//                                             kep::Vector3(nmgen.m_voxelSize, nmgen.m_voxelSize, nmgen.m_voxelSize)
+//                                             kep::Vector3(nmgen->m_voxelSize, nmgen->m_voxelSize, nmgen->m_voxelSize)
 //                                             ));
 //         refTransform->m_position.dump();
 //         
@@ -130,7 +136,7 @@ World_0::World_0(Core * _core) : World(_core)
     
     //REGION VISUALS
 //     srand(time(NULL));
-//     for(uint regID = 0; regID<nmgen.m_regGen->m_regions.size(); regID++)
+//     for(uint regID = 0; regID<nmgen->m_regGen->m_regions.size(); regID++)
 //     {
 //         
 //         int r0 = rand() % 100;
@@ -139,23 +145,23 @@ World_0::World_0(Core * _core) : World(_core)
 //         //printf("rand n: %f \n", (float)r/100.0f);
 //         
 //         kep::Vector3 col = kep::Vector3((float)r0/100.0f, (float)r1/100.0f, (float)r2/100.0f);
-//         for(uint i = 0; i<nmgen.m_regGen->m_regions[regID]->m_voxels.size(); i++)
+//         for(uint i = 0; i<nmgen->m_regGen->m_regions[regID]->m_voxels.size(); i++)
 //         {
 //             
 //             refEntity = new Entity(this, "quad");
 //             refTransform = (Transform*)refEntity->addComponent(new Transform(
-//                                                 kep::Vector3(nmgen.m_regGen->m_regions[regID]->m_voxels[i]->aabb->c.x, nmgen.m_regGen->m_regions[regID]->m_voxels[i]->aabb->c.y + nmgen.m_voxelSize, nmgen.m_regGen->m_regions[regID]->m_voxels[i]->aabb->c.z),
+//                                                 kep::Vector3(nmgen->m_regGen->m_regions[regID]->m_voxels[i]->aabb->c.x, nmgen->m_regGen->m_regions[regID]->m_voxels[i]->aabb->c.y + nmgen->m_voxelSize, nmgen->m_regGen->m_regions[regID]->m_voxels[i]->aabb->c.z),
 //                                                 kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
-//                                                 kep::Vector3(nmgen.m_voxelSize, nmgen.m_voxelSize, nmgen.m_voxelSize)
+//                                                 kep::Vector3(nmgen->m_voxelSize, nmgen->m_voxelSize, nmgen->m_voxelSize)
 //                                                 ));
 //             refEntity->addComponent(new Render(m_core->m_plane, m_core->m_shaderMinimal ,NULL, RenderMode::SOLID, col));
 //         }
 //     }
     
     //EDGE VISUALS
-//     for(uint j = 0; j<nmgen.m_contGen->m_contours.size(); j++)
+//     for(uint j = 0; j<nmgen->m_contGen->m_contours.size(); j++)
 //     {
-//         std::vector<deway::Edge*> & edges = nmgen.m_contGen->m_contours[j]->m_cntrE;
+//         std::vector<deway::Edge*> & edges = nmgen->m_contGen->m_contours[j]->m_cntrE;
 //         for(uint i = 0; i < edges.size(); i++)
 //         {
 //             m_core->m_contour->addLine(edges[i]->vertex[0]->pos, edges[i]->vertex[1]->pos);
@@ -163,19 +169,19 @@ World_0::World_0(Core * _core) : World(_core)
 //     }
 //     m_core->m_contour->gen();
     
-//     for(uint j = 0; j<nmgen.m_contGen->m_regions_ref->size(); j++)
+//     for(uint j = 0; j<nmgen->m_contGen->m_regions_ref->size(); j++)
 //     {
 //         float asd = 0.0f;
-//         for(uint k = 0; k<(*nmgen.m_contGen->m_regions_ref)[j]->m_voxels.size(); k++)
+//         for(uint k = 0; k<(*nmgen->m_contGen->m_regions_ref)[j]->m_voxels.size(); k++)
 //         {
 //             for(uint l = 0; l<4; l++)
 //             {
-//                 //(*nmgen.m_contGen->m_regions_ref)[j]->m_voxels[k]->edg[l];
-//                 if((*nmgen.m_contGen->m_regions_ref)[j]->m_voxels[k]->edg[l]->external)
+//                 //(*nmgen->m_contGen->m_regions_ref)[j]->m_voxels[k]->edg[l];
+//                 if((*nmgen->m_contGen->m_regions_ref)[j]->m_voxels[k]->edg[l]->external)
 //                 {
-//                     //tmpVox.push_back((*nmgen.m_contGen->m_regions_ref)[j]->m_voxels[k]);
+//                     //tmpVox.push_back((*nmgen->m_contGen->m_regions_ref)[j]->m_voxels[k]);
 //                     //for(uint x = 0; x<4; x++)
-//                         m_core->m_contour->addLine( (*nmgen.m_contGen->m_regions_ref)[j]->m_voxels[k]->edg[l]->vertex[0]->pos /*+ kep::Vector3(asd,asd,asd)*/, (*nmgen.m_contGen->m_regions_ref)[j]->m_voxels[k]->edg[l]->vertex[1]->pos/*+ kep::Vector3(asd,asd,asd)*/);
+//                         m_core->m_contour->addLine( (*nmgen->m_contGen->m_regions_ref)[j]->m_voxels[k]->edg[l]->vertex[0]->pos /*+ kep::Vector3(asd,asd,asd)*/, (*nmgen->m_contGen->m_regions_ref)[j]->m_voxels[k]->edg[l]->vertex[1]->pos/*+ kep::Vector3(asd,asd,asd)*/);
 //                     //break;
 //                 }
 //             }
@@ -197,9 +203,9 @@ World_0::World_0(Core * _core) : World(_core)
 //     refEntity->addComponent(new Render(m_core->m_contour, m_core->m_shaderMinimal, NULL, RenderMode::WIRE));
     
     //CONTOUR VISUALS
-//     for(uint j = 0; j<nmgen.m_contGen->m_contours.size(); j++)
+//     for(uint j = 0; j<nmgen->m_contGen->m_contours.size(); j++)
 //     {
-//         std::vector<deway::Vertex*> & verts = nmgen.m_contGen->m_contours[j]->m_reducedVerts;
+//         std::vector<deway::Vertex*> & verts = nmgen->m_contGen->m_contours[j]->m_reducedVerts;
 //         for(uint i = 0; i < verts.size(); i++)
 //         {
 //             if(i == (verts.size()-1))
@@ -222,11 +228,16 @@ World_0::World_0(Core * _core) : World(_core)
     
     //NAV-MESH VISUALS
     
-    for(uint i = 0; i< nmgen.m_triGen->m_navMesh.size(); i++)
+    for(uint i = 0; i< nmgen->m_triGen->m_navMesh.size(); i++)
     {
-        m_core->m_navMesh->addTri(nmgen.m_triGen->m_navMesh[i]->vertex[0]->pos, nmgen.m_triGen->m_navMesh[i]->vertex[1]->pos, nmgen.m_triGen->m_navMesh[i]->vertex[2]->pos);
+        m_core->m_navMesh->addTri(nmgen->m_triGen->m_navMesh[i]->vertex[0]->pos, nmgen->m_triGen->m_navMesh[i]->vertex[1]->pos, nmgen->m_triGen->m_navMesh[i]->vertex[2]->pos);
+        
+        //render neighbours
+//         for(uint j = 0; j<3; j++)
+//            if(nmgen->m_triGen->m_navMesh[i]->nghbr[j] != NULL) 
+//                m_core->m_navMesh->addTri(nmgen->m_triGen->m_navMesh[i]->nghbr[j]->vertex[0]->pos, nmgen->m_triGen->m_navMesh[i]->nghbr[j]->vertex[1]->pos, nmgen->m_triGen->m_navMesh[i]->nghbr[j]->vertex[2]->pos);
+        
     }
-    //m_core->m_navMesh->addTri(kep::Vector3(3.0f, 5.0f, 6.0f), kep::Vector3(0.0f, 9.0f, -5.0f), kep::Vector3(-6.0f, 4.0f, 8.0f));
     m_core->m_navMesh->gen();
     
     refEntity = new Entity(this, "navMesh edges");
@@ -248,9 +259,9 @@ World_0::World_0(Core * _core) : World(_core)
     
     
     //SEGMENT VISUALS
-//     for(uint j = 0; j<nmgen.m_contGen->m_contours.size(); j++)
+//     for(uint j = 0; j<nmgen->m_contGen->m_contours.size(); j++)
 //     {
-//         std::vector<std::vector<deway::Vertex*>> & segs = nmgen.m_contGen->m_contours[j]->m_segments;
+//         std::vector<std::vector<deway::Vertex*>> & segs = nmgen->m_contGen->m_contours[j]->m_segments;
 //         for(uint m = 0; m<segs.size(); m++)
 //         for(uint i = 0; i < segs[m].size()-1; i++)
 //         {
@@ -269,16 +280,16 @@ World_0::World_0(Core * _core) : World(_core)
 //     refEntity->addComponent(new Render(m_core->m_contour, m_core->m_shaderMinimal, NULL, RenderMode::WIRE));
     
     //EXTERNAL EDGE VISUALS
-//     for(uint regID = 0; regID<nmgen.m_regGen->m_regions.size(); regID++)
+//     for(uint regID = 0; regID<nmgen->m_regGen->m_regions.size(); regID++)
 //     {
 //         kep::Vector3 col = kep::Vector3(1, 0, 0);
-//         for(uint i = 0; i<nmgen.m_regGen->m_regions[regID]->m_voxels.size(); i++)
+//         for(uint i = 0; i<nmgen->m_regGen->m_regions[regID]->m_voxels.size(); i++)
 //         {
 //             bool isExt = false;
 //             for(uint j = 0; j<4; j++)
-//                 if(nmgen.m_regGen->m_regions[regID]->m_voxels[i]->edg[j]->external)
+//                 if(nmgen->m_regGen->m_regions[regID]->m_voxels[i]->edg[j]->external)
 //                 {
-//                     m_core->m_contour->addLine(nmgen.m_regGen->m_regions[regID]->m_voxels[i]->edg[j]->v[0], nmgen.m_regGen->m_regions[regID]->m_voxels[i]->edg[j]->v[1]);
+//                     m_core->m_contour->addLine(nmgen->m_regGen->m_regions[regID]->m_voxels[i]->edg[j]->v[0], nmgen->m_regGen->m_regions[regID]->m_voxels[i]->edg[j]->v[1]);
 //                 }
 //         }
 //     }
@@ -296,39 +307,39 @@ World_0::World_0(Core * _core) : World(_core)
     
     
     //DISTANCE MAP VISUALS
-//     for(int i = 0; i<nmgen.m_numTravVoxels; i++)
+//     for(int i = 0; i<nmgen->m_numTravVoxels; i++)
 //     {
 //         refEntity = new Entity(this, "quad");
 //         refTransform = (Transform*)refEntity->addComponent(new Transform(
-//                                             kep::Vector3(nmgen.m_travVoxels[i]->aabb->c.x, nmgen.m_travVoxels[i]->aabb->c.y + nmgen.m_voxelSize, nmgen.m_travVoxels[i]->aabb->c.z),
+//                                             kep::Vector3(nmgen->m_travVoxels[i]->aabb->c.x, nmgen->m_travVoxels[i]->aabb->c.y + nmgen->m_voxelSize, nmgen->m_travVoxels[i]->aabb->c.z),
 //                                             kep::Quaternion(kep::Vector3(0,1,0), 0.0f), 
-//                                             kep::Vector3(nmgen.m_voxelSize, nmgen.m_voxelSize, nmgen.m_voxelSize)
+//                                             kep::Vector3(nmgen->m_voxelSize, nmgen->m_voxelSize, nmgen->m_voxelSize)
 //                                             ));
-//         float shade = nmgen.m_travVoxels[i]->dist/nmgen.m_maxEdgeDist;
+//         float shade = nmgen->m_travVoxels[i]->dist/nmgen->m_maxEdgeDist;
 //         
 //         refEntity->addComponent(new Render(m_core->m_plane, m_core->m_shaderMinimal ,NULL, RenderMode::SOLID, kep::Vector3(shade, shade, shade)));
 //     }
     
     
     //TEST VOLUME VISUALIZATION USING LINES///////////////////////////////////////////////////////////////////
-//     for(int i = 0; i<nmgen.m_numTravVoxels; i++)
+//     for(int i = 0; i<nmgen->m_numTravVoxels; i++)
 //     {
-//         m_core->m_voxelVolumeMesh->addBox(nmgen.m_travVoxels[i]->aabb->c, nmgen.m_travVoxels[i]->aabb->hs);
+//         m_core->m_voxelVolumeMesh->addBox(nmgen->m_travVoxels[i]->aabb->c, nmgen->m_travVoxels[i]->aabb->hs);
 //     }
 //     
-//     for(int i = 0; i<nmgen.m_numEdgeVoxels; i++)
+//     for(int i = 0; i<nmgen->m_numEdgeVoxels; i++)
 //     {
-//         m_core->m_voxelVolumeMesh->addTopQuad(nmgen.m_edgeVoxels[i]->aabb->c, nmgen.m_edgeVoxels[i]->aabb->hs);
+//         m_core->m_voxelVolumeMesh->addTopQuad(nmgen->m_edgeVoxels[i]->aabb->c, nmgen->m_edgeVoxels[i]->aabb->hs);
 //     }
     
-//     for(int i = 0; i<nmgen.m_numVoxel; i++)
+//     for(int i = 0; i<nmgen->m_numVoxel; i++)
 //     {
-//         m_core->m_voxelVolumeMesh->addBox(nmgen.m_voxels[i].aabb.c, nmgen.m_voxels[i].aabb.hs);
+//         m_core->m_voxelVolumeMesh->addBox(nmgen->m_voxels[i].aabb.c, nmgen->m_voxels[i].aabb.hs);
 //     }
     
-//     for(int i = 0; i<nmgen.m_spans[0].m_size; i++)
+//     for(int i = 0; i<nmgen->m_spans[0].m_size; i++)
 //     {
-//         m_core->m_voxelVolumeMesh->addBox(nmgen.m_spans[0].m_voxels[i]->aabb.c, nmgen.m_spans[0].m_voxels[i]->aabb.hs);
+//         m_core->m_voxelVolumeMesh->addBox(nmgen->m_spans[0].m_voxels[i]->aabb.c, nmgen->m_spans[0].m_voxels[i]->aabb.hs);
 //     }
     
 //     m_core->m_voxelVolumeMesh->gen();
@@ -367,7 +378,8 @@ World_0::World_0(Core * _core) : World(_core)
 }
 World_0::~World_0()
 {
-    
+    delete nmgen;
+    delete pathFinder;
 }
 
 void World_0::initW()
