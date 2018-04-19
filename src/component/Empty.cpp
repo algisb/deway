@@ -3,12 +3,19 @@
 #include "Input.h"
 #include "Time.h"
 #include <Core.h>
+#include "deway/pathfinder/PathFinder.h"
+#include "deway/pathfinder/Loc.h"
+#include "deway/TriangleO.h"
+#include "deway/Vertex.h"
 
 using namespace kelp;
-Empty::Empty(Entity * _playerCamera)
+Empty::Empty(Entity * _playerCamera, KePhys * _agentBody, Agent * _agent, MeshGen * _trigen)
 {
     kekX = -8.0f;
     m_playerCameraEntity = _playerCamera;
+    m_agentBody_ref = _agentBody;
+    m_agent_ref = _agent;
+    m_triGen_ref = _trigen;
 }
 Empty::~Empty()
 {
@@ -56,23 +63,35 @@ void Empty::update()
 // 
 //         
 //         //printf("comp: %f\n", moveDirVelComp);
-//         if(Input::Keyboard::is(Input::Keyboard::KeyboardKey::KEY_W, Input::Keyboard::KeyboardAction::HELD))
-//         {
-// 
-//         }
-//         if(Input::Keyboard::is(Input::Keyboard::KeyboardKey::KEY_S, Input::Keyboard::KeyboardAction::HELD))
-//         {
-// 
-//             
-//         }
-//         if(Input::Keyboard::is(Input::Keyboard::KeyboardKey::KEY_A, Input::Keyboard::KeyboardAction::HELD))
-//         {
-// 
-//         }
-//         if(Input::Keyboard::is(Input::Keyboard::KeyboardKey::KEY_D, Input::Keyboard::KeyboardAction::HELD))
-//         {
-// 
-//         }
+        if(Input::Keyboard::is(Input::Keyboard::KeyboardKey::KEY_U, Input::Keyboard::KeyboardAction::HELD))
+        {
+            m_agentBody_ref ->m_rigidBody->addForce(kep::Vector3(0,0,100));
+        }
+        if(Input::Keyboard::is(Input::Keyboard::KeyboardKey::KEY_J, Input::Keyboard::KeyboardAction::HELD))
+        {
+            m_agentBody_ref ->m_rigidBody->addForce(kep::Vector3(0,0,-100));
+        }
+        if(Input::Keyboard::is(Input::Keyboard::KeyboardKey::KEY_H, Input::Keyboard::KeyboardAction::HELD))
+        {
+            m_agentBody_ref ->m_rigidBody->addForce(kep::Vector3(100,0,0));
+        }
+        if(Input::Keyboard::is(Input::Keyboard::KeyboardKey::KEY_K, Input::Keyboard::KeyboardAction::HELD))
+        {
+            m_agentBody_ref ->m_rigidBody->addForce(kep::Vector3(-100,0,0));
+        }
+        if(Input::Keyboard::is(Input::Keyboard::KeyboardKey::KEY_SPACE, Input::Keyboard::KeyboardAction::PRESSED))
+        {
+            printf("Looking for loc\n");
+            deway::Loc loc;
+            if(m_agent_ref->m_pathFinder->getLoc(&loc, m_agent_ref->m_transform->m_position) == 0)
+            {
+                printf("found loc \n");
+                //m_triGen_ref->clear();
+                m_triGen_ref->m_verticies.clear();
+                m_triGen_ref->addTri(loc.tri->vertex[0]->pos, loc.tri->vertex[1]->pos, loc.tri->vertex[2]->pos);
+                m_triGen_ref->gen();
+            }
+        }
 
 
         

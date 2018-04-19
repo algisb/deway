@@ -3,6 +3,8 @@
 #include "Component.h"
 #include "Entity.h"
 #include "KePhys.h"
+#include "Agent.h"
+#include "Mesh.h"
 namespace kelp
 {
     class Empty : public Component
@@ -14,7 +16,11 @@ namespace kelp
         Camera * m_playerCameraComp;
         kep::Vector3 lastFrameVel;
         
-        Empty(Entity * _playerCamera);
+        KePhys * m_agentBody_ref;
+        Agent * m_agent_ref;
+        MeshGen * m_triGen_ref;
+        
+        Empty(Entity * _playerCamera, KePhys * _agentBody, Agent * _agent, MeshGen * _trigen);
         ~Empty();
         void init();
         void update();

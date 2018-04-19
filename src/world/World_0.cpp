@@ -20,6 +20,7 @@
 #include "deway/TriGen.h"
 #include "deway/TriangleO.h"
 #include "deway/pathfinder/PathFinder.h"
+#include "component/Agent.h"
 
 using namespace kelp;
 
@@ -28,6 +29,8 @@ World_0::World_0(Core * _core) : World(_core)
     Entity * refEntity = NULL;
     Transform * refTransform = NULL;
     kep::MeshCollider * mc = NULL;
+    KePhys * refKePhys = NULL;
+    Agent * refAgent = NULL;
     
     //LIGHTS//////////////////////////////////////////////////////////////////////////////////////
     refEntity = new Entity(this, "Directional Light");
@@ -58,10 +61,6 @@ World_0::World_0(Core * _core) : World(_core)
     //NAV-MESH SOURCE MESH
     Mesh * polySoup = /*m_core->m_triangleMesh;*/m_core->m_sandBox; //<----------------------------------------------------
     
-    //TEST TRIANGLE
-    m_core->m_triangleMesh->addTri(kep::Vector3(3.0f, 5.0f, 6.0f), kep::Vector3(0.0f, 9.0f, -5.0f), kep::Vector3(-6.0f, 4.0f, 8.0f));
-    m_core->m_triangleMesh->gen();
-    
     refEntity = new Entity(this, "sandbox");
     refTransform = (Transform*)refEntity->addComponent(new Transform(
                                         kep::Vector3(0.0f, 0.0f, 0.0f),
@@ -69,6 +68,11 @@ World_0::World_0(Core * _core) : World(_core)
                                         kep::Vector3(1.0f, 1.0f, 1.0f)
                                         ));
     refEntity->addComponent(new Render(polySoup, m_core->m_shaderDefault, NULL, RenderMode::SOLID));
+    mc = new kep::MeshCollider(kep::Matrix4(), m_core->m_sandBox->m_dataV, m_core->m_sandBox->m_dataN, m_core->m_sandBox->m_numVertices, refTransform->m_scale);
+    refEntity->addComponent(new KePhys(
+        m_physWorld->addRigidBody(new kep::RigidBody(&refTransform->m_position, &refTransform->m_orientation, true, 0.0f, mc))//new kep::HalfPlaneCollider()
+    ));
+    
     
     //NAV-MESH GENERATOR
     nmgen = new deway::NMGen(polySoup->m_dataV, polySoup->m_dataN, polySoup->m_numVertices,
@@ -84,6 +88,36 @@ World_0::World_0(Core * _core) : World(_core)
     
     //PATHFINDER
     pathFinder = new deway::PathFinder(&nmgen->m_triGen->m_navMesh);
+    
+    
+    
+    //AGENT ENTITY
+    refEntity = new Entity(this, "Agent");
+    refTransform = (Transform*)refEntity->addComponent(new Transform(
+                                        kep::Vector3(5.0f, 50.0f, 5.0f),
+                                        kep::Quaternion(), 
+                                        kep::Vector3(1.0f, 1.0f, 1.0f)
+                                        ));
+    refEntity->addComponent(new Render(m_core->m_sphereMesh, m_core->m_shaderDefault, NULL, RenderMode::SOLID));
+    
+    refKePhys = (KePhys*)refEntity->addComponent(new KePhys(
+        m_physWorld->addRigidBody(new kep::RigidBody(&refTransform->m_position, &refTransform->m_orientation, true, 1.0f, new kep::SphereCollider(kep::Matrix4()),true))
+    ));
+    refAgent = (Agent*)refEntity->addComponent(new Agent(pathFinder));
+    
+    //TEST TRIANGLE
+    m_core->m_triangleMesh->addTri(kep::Vector3(3.0f, 5.0f, 6.0f), kep::Vector3(0.0f, 9.0f, -5.0f), kep::Vector3(-6.0f, 4.0f, 8.0f));
+    m_core->m_triangleMesh->gen();
+    refEntity = new Entity(this, "Loc tri");
+    refEntity->addComponent(new Transform(
+                                        kep::Vector3(0.0f, 0.0f, 0.0f),
+                                        kep::Quaternion(), 
+                                        kep::Vector3(1.0f, 1.0f, 1.0f)
+                                        ));
+    refEntity->addComponent(new Render(m_core->m_triangleMesh, m_core->m_shaderMinimal, NULL, RenderMode::SOLID,kep::Vector4(1.0f, 0.0f ,0.0f, 0.5f)));
+    
+    
+    
     
     
     
@@ -374,7 +408,7 @@ World_0::World_0(Core * _core) : World(_core)
                                 true
                             ));
     refEntity = new Entity(this, "empty");//empty structure for having global components and testing stuff
-    refEntity->addComponent(new Empty(empty[1]));
+    refEntity->addComponent(new Empty(empty[1], refKePhys, refAgent, m_core->m_triangleMesh));
 }
 World_0::~World_0()
 {

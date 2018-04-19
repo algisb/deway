@@ -20,6 +20,7 @@ World::~World()
     for(int i = 0; i< m_entities.size(); i++)
         delete m_entities[i];
     m_entities.clear();
+    delete m_physWorld;
 }
 
 void World::update()
