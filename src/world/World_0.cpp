@@ -118,8 +118,20 @@ World_0::World_0(Core * _core) : World(_core)
     
     
     
+    m_core->m_testLine->addLine(kep::Vector3(), kep::Vector3(0.0f, 20.0f, 0.0f));
+    m_core->m_testLine->gen();
     
+    refEntity = new Entity(this, "user ray");
+    refEntity->addComponent(new Transform(
+                                        kep::Vector3(0.0f, 0.0f, 0.0f),
+                                        kep::Quaternion(), 
+                                        kep::Vector3(1.0f, 1.0f, 1.0f)
+                                        ));
+    refEntity->addComponent(new Render(m_core->m_testLine, m_core->m_shaderMinimal, NULL, RenderMode::SOLID,kep::Vector4(1.0f, 1.0f ,0.0f, 1.0f)));
     
+
+    
+    /////////////////////////////////////////////////////////////////////////   
     
     m_core->m_voxelVolumeOutlineMesh->addBox(kep::Vector3(nmgen->m_offset.x, 
                                                           nmgen->m_offset.y, 
@@ -408,7 +420,7 @@ World_0::World_0(Core * _core) : World(_core)
                                 true
                             ));
     refEntity = new Entity(this, "empty");//empty structure for having global components and testing stuff
-    refEntity->addComponent(new Empty(empty[1], refKePhys, refAgent, m_core->m_triangleMesh));
+    refEntity->addComponent(new Empty(empty[1], refKePhys, refAgent, m_core->m_triangleMesh, m_core->m_testLine));
 }
 World_0::~World_0()
 {

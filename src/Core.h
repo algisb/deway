@@ -52,7 +52,7 @@ namespace kelp
         MeshGenLine * m_contour;
         MeshGen * m_navMesh;
         
-        
+        MeshGenLine * m_testLine;
         
         ShaderMin * m_shaderMinimal;
         ShaderDefault * m_shaderDefault;

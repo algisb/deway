@@ -538,6 +538,15 @@ Vector3 Matrix4::operator*(const Vector3 & _vector) const
                    data[8]*_vector.x + data[9]*_vector.y + data[10]*_vector.z + data[11]);
 }
 
+Vector4 Matrix4::operator*(const Vector4 & _vector) const
+{
+    return Vector4(data[0]*_vector.x + data[1]*_vector.y + data[2]*_vector.z + data[3]*_vector.w, 
+                   data[4]*_vector.x + data[5]*_vector.y + data[6]*_vector.z + data[7]*_vector.w,
+                   data[8]*_vector.x + data[9]*_vector.y + data[10]*_vector.z + data[11]*_vector.w,
+                   data[12]*_vector.x + data[13]*_vector.y + data[14]*_vector.z + data[15]*_vector.w
+                  );
+}
+
 Matrix4 Matrix4::operator*(const Matrix4 &_o) const
 {
     Matrix4 result;

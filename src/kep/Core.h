@@ -25,6 +25,7 @@ namespace kep
     private:
         //real pad; //fucks with opengl when passing stuff to buffers
     public:
+        
         Vector3() : x(0) , y(0), z(0){}
         Vector3(real _x, real _y, real _z) : x(_x), y(_y), z(_z){}
         ~Vector3(){}
@@ -163,6 +164,7 @@ namespace kep
         
         Vector3 operator*(const Vector3 &_vector) const;
         
+        
         real determinant() const;
         Matrix3 transpose() const;
         Matrix3 cofactor() const;
@@ -196,6 +198,7 @@ namespace kep
         
         ~Matrix4();
         Vector3 operator*(const Vector3 &_vector) const;
+        Vector4 operator*(const Vector4 &_vector) const;
         Matrix4 operator*(const Matrix4 &_o) const;
         real determinant() const;
         Matrix4 transpose() const;

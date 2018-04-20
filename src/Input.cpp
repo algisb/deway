@@ -242,7 +242,7 @@ void Input::Mouse::init()
     s_keys.push_back(MOUSE_BUTTON_MIDDLE );
 
     s_initInput = true;
-    glfwSetCursorPos(window,Config::s_windowWidth/2, Config::s_windowHeight/2);
+    //glfwSetCursorPos(window,Config::s_windowWidth/2, Config::s_windowHeight/2);
 }
 
 void Input::Mouse::update(int _key, int _action)
@@ -331,6 +331,16 @@ void Input::Mouse::setMOuseNormalMode()
 void Input::update()
 {
     glfwGetCursorPos(window, &Mouse::x, &Mouse::y);
+    if(Mouse::x > Config::s_windowWidth)
+        Mouse::x = Config::s_windowWidth;
+    if(Mouse::x < 0)
+        Mouse::x = 0;
+    if(Mouse::y > Config::s_windowHeight)
+        Mouse::y = Config::s_windowHeight;
+    if(Mouse::y < 0)
+        Mouse::y = 0;
+    
+    
     Mouse::dx = Mouse::x - Mouse::xLastFrame;
     Mouse::dy = Mouse::y - Mouse::yLastFrame;
     

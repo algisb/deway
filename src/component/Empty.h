@@ -19,8 +19,9 @@ namespace kelp
         KePhys * m_agentBody_ref;
         Agent * m_agent_ref;
         MeshGen * m_triGen_ref;
+        MeshGenLine * m_testLine_ref;
         
-        Empty(Entity * _playerCamera, KePhys * _agentBody, Agent * _agent, MeshGen * _trigen);
+        Empty(Entity * _playerCamera, KePhys * _agentBody, Agent * _agent, MeshGen * _trigen, MeshGenLine * _testLine);
         ~Empty();
         void init();
         void update();
