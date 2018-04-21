@@ -5,6 +5,7 @@
 #include "kep/Core.h"
 #include "Config.h"
 #include "Transform.h"
+#include "KePhys.h"
 
 namespace deway
 {
@@ -19,7 +20,14 @@ namespace kelp
     {
     public:
         Transform * m_transform;
+        KePhys * m_kephys;
         deway::PathFinder * m_pathFinder;
+        
+        
+        std::vector<kep::Vector3> m_path;
+        uint m_pathProgress;
+        
+        
         Agent(deway::PathFinder * _pathFinder);
         ~Agent();
         
@@ -27,11 +35,13 @@ namespace kelp
         void update();
         void render();
         
-        void tracePath(deway::Vertex * _endVertex, std::vector<kep::Vector3> * o_path);
+        void tracePath(deway::Vertex * _endVertex);
         bool findVertex(deway::Vertex * _vertToFind, std::vector<deway::Vertex*> * _container);
         void clearGraph();
         
-        int genPath(deway::Loc * _finish, std::vector<kep::Vector3> * o_path);
+        int genPath(deway::Loc * _finish);
+        
+        bool atPos(kep::Vector3 _pos);
 
     };
 };

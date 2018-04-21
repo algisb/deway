@@ -86,7 +86,7 @@ void Empty::update()
     }
     if(Input::Keyboard::is(Input::Keyboard::KeyboardKey::KEY_SPACE, Input::Keyboard::KeyboardAction::PRESSED))
     {
-
+        m_agentBody_ref->m_rigidBody->velocity = kep::Vector3(m_agentBody_ref->m_rigidBody->velocity.x, m_agentBody_ref->m_rigidBody->velocity.y+15.0f, m_agentBody_ref->m_rigidBody->velocity.z);
 // Gets the location of the agent body
 //         printf("Looking for loc\n");
 //         deway::Loc loc;
@@ -117,16 +117,15 @@ void Empty::update()
             m_triGen_ref->addTri(mouseRayLoc.tri->vertex[0]->pos, mouseRayLoc.tri->vertex[1]->pos, mouseRayLoc.tri->vertex[2]->pos);
             m_triGen_ref->gen();
             
-            std::vector<kep::Vector3> path;
-            m_agent_ref->genPath(&mouseRayLoc, &path);
+            m_agent_ref->genPath(&mouseRayLoc);
             
             ////////////////////////
-            if(path.size() > 1)
+            if(m_agent_ref->m_path.size() > 1)
             {
                 m_testLine_ref->m_verticies.clear();
-                for(uint i = 0; i < path.size()-1; i++)
+                for(uint i = 0; i < m_agent_ref->m_path.size()-1; i++)
                 {
-                    m_testLine_ref->addLine(path[i], path[i+1]);
+                    m_testLine_ref->addLine(m_agent_ref->m_path[i], m_agent_ref->m_path[i+1]);
                 }
                 m_testLine_ref->gen();
             }

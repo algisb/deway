@@ -8,6 +8,7 @@ using namespace kelp;
 Agent::Agent(deway::PathFinder * _pathFinder) : Component()
 {
     m_pathFinder = _pathFinder;
+    m_pathProgress = 0;
 }
 Agent::~Agent()
 {
@@ -16,11 +17,34 @@ Agent::~Agent()
 void Agent::init()
 {
     m_transform = m_owner->getComponent<Transform>();
+    m_kephys = m_owner->getComponent<KePhys>();
 }
 
 void Agent::update()
 {
-    
+    //progress with the path
+    if(m_path.size() > 0)
+    {
+        if(!atPos(m_path[m_path.size()-1]))
+        {
+            if(atPos(m_path[m_pathProgress]))
+                m_pathProgress++;
+            
+            float vel = m_kephys->m_rigidBody->velocity.magnitude();
+            //if(vel < 5.0f)
+            //{
+                kep::Vector3 dir = (m_path[m_pathProgress] - m_transform->m_position).normalized();
+                m_kephys->m_rigidBody->velocity = dir *5.0f;
+                //m_kephys->m_rigidBody->addForce(dir *100.0f);
+            //}
+            
+        }
+        else
+        {
+            m_kephys->m_rigidBody->velocity = kep::Vector3();
+        }
+            
+    }
 }
 
 void Agent::render()
@@ -28,7 +52,7 @@ void Agent::render()
     
 }
 
-void Agent::tracePath(deway::Vertex * _endVertex, std::vector<kep::Vector3> * o_path)
+void Agent::tracePath(deway::Vertex * _endVertex)
 {
     std::vector<kep::Vector3> revPath;
     deway::Vertex * currentVertex = _endVertex;
@@ -41,7 +65,7 @@ void Agent::tracePath(deway::Vertex * _endVertex, std::vector<kep::Vector3> * o_
     //printf("rev list size: %d \n", revPath.size());
     for(int i = revPath.size() - 1; i > -1; i--)
     {
-        o_path->push_back(revPath[i]);
+        m_path.push_back(revPath[i]);
     }
 }
 bool Agent::findVertex(deway::Vertex* _vertToFind, std::vector<deway::Vertex *>* _container)
@@ -65,16 +89,19 @@ void Agent::clearGraph()
 }
 
 
-int Agent::genPath(deway::Loc * _finish, std::vector<kep::Vector3> * o_path)
+int Agent::genPath(deway::Loc * _finish)
 {
+    m_pathProgress = 0;
+    m_path.clear();
+    
     deway::Loc start;
     m_pathFinder->getLoc(&start, m_transform->m_position);
     
     //start and finish location is in the same triangle
     if(start.tri == _finish->tri)
     {
-        o_path->push_back(start.pos);
-        o_path->push_back(_finish->pos);
+        m_path.push_back(start.pos);
+        m_path.push_back(_finish->pos);
         return 0;
     }
     else//Run A*
@@ -128,9 +155,9 @@ int Agent::genPath(deway::Loc * _finish, std::vector<kep::Vector3> * o_path)
                 if(currentVert == finishVerts[i])
                 {
                     //trace the path
-                    tracePath(currentVert, o_path);
-                    o_path->insert(o_path->begin(), start.pos);
-                    o_path->push_back(_finish->pos);
+                    tracePath(currentVert);
+                    m_path.insert(m_path.begin(), start.pos);
+                    m_path.push_back(_finish->pos);
                     //TODO:Add the detailed positions to the path
                     //printf("got path %d \n", o_path->size());
                     return 0;
@@ -169,7 +196,15 @@ int Agent::genPath(deway::Loc * _finish, std::vector<kep::Vector3> * o_path)
     return 1;
 }
 
-
+bool Agent::atPos(kep::Vector3 _pos)
+{
+    float d = (m_transform->m_position - _pos).magnitude();
+    if(d < 1.0f)
+        return true;
+    else
+        return false;
+        
+}
 
 
 
