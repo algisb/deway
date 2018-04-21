@@ -5,6 +5,12 @@
 #include "KePhys.h"
 #include "Agent.h"
 #include "Mesh.h"
+
+namespace deway 
+{
+    class Ray;
+    class Loc;
+};
 namespace kelp
 {
     class Empty : public Component
@@ -26,6 +32,13 @@ namespace kelp
         void init();
         void update();
         void render();
+        
+        deway::Ray genMouseRay();
+        deway::Loc getMouseRayLoc(deway::Ray _mouseRay);
+        
+        
+        
+        
     };
 };
 

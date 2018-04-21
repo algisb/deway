@@ -125,7 +125,13 @@ void TriGen::earClip()
     
     
             if(v[0] != NULL)//this should never happen, but since our programmed algorithm sucks it might happen - SOLUTION : use mesh triangulation third party library
-                m_navMesh.push_back(new TriangleO(v[0], v[1], v[2]));// add the triangle to the nav mesh
+            {
+                TriangleO * tri = new TriangleO(v[0], v[1], v[2]);
+                m_navMesh.push_back(tri);// add the triangle to the nav mesh
+                v[0]->nghbr.push_back(tri);
+                v[1]->nghbr.push_back(tri);
+                v[2]->nghbr.push_back(tri);
+            }
             else
             {
                 printf("ERROR line:%d file:%s - TriGen skipping a triangle due to unmet conditions, broken navmesh \n", __LINE__, __FILE__);

@@ -9,6 +9,8 @@
 namespace deway
 {
     class PathFinder;
+    class Loc;
+    class Vertex;
 };
 namespace kelp
 {
@@ -24,6 +26,11 @@ namespace kelp
         void init();
         void update();
         void render();
+        
+        void tracePath(deway::Vertex * _endVertex, std::vector<kep::Vector3> * o_path);
+        
+        bool findVertex(deway::Vertex * _vertToFind, std::vector<deway::Vertex*> * _container);
+        int genPath(deway::Loc * _finish, std::vector<kep::Vector3> * o_path);
     };
 };
 

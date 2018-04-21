@@ -20,7 +20,7 @@ namespace deway
         void genNormals();
         void sortMesh();
         
-        int rayTriangleMT97(Ray * _ray, TriangleO * _triangle,  kep::Vector3 * o_point);
+        static int rayTriangleMT97(Ray * _ray, TriangleO * _triangle,  kep::Vector3 * o_point);
         
         int getLoc(Loc * o_loc, kep::Vector3 _pos);
     };

@@ -7,6 +7,9 @@
 #include "deway/pathfinder/Loc.h"
 #include "deway/TriangleO.h"
 #include "deway/Vertex.h"
+#include "deway/pathfinder/Ray.h"
+#include "deway/pathfinder/Loc.h"
+#include "deway/TriangleO.h"
 
 using namespace kelp;
 Empty::Empty(Entity * _playerCamera, KePhys * _agentBody, Agent * _agent, MeshGen * _trigen, MeshGenLine * _testLine)
@@ -84,8 +87,7 @@ void Empty::update()
     if(Input::Keyboard::is(Input::Keyboard::KeyboardKey::KEY_SPACE, Input::Keyboard::KeyboardAction::PRESSED))
     {
 
-        
-        
+// Gets the location of the agent body
 //         printf("Looking for loc\n");
 //         deway::Loc loc;
 //         if(m_agent_ref->m_pathFinder->getLoc(&loc, m_agent_ref->m_transform->m_position) == 0)
@@ -99,33 +101,43 @@ void Empty::update()
     }
     if(Input::Mouse::is(Input::Mouse::MOUSE_BUTTON_LEFT,Input::Mouse::MouseAction::PRESSED))
     {
-        //SHOOT RAY
-        float x_hwc = (Input::Mouse::x * 2.0f)/Config::s_windowWidth -1.0f;
-        float y_hwc = 1.0f - (2.0f * Input::Mouse::y) / Config::s_windowHeight;
 
-
-        kep::Matrix4 vI;
-        vI.setOrientationAndPos(m_playerCameraComp->m_transform->m_orientation, kep::Vector3());
-        kep::Matrix4 pI = m_playerCameraComp->m_projectionMat.inverse();
-
-        kep::Vector4 rayClip(x_hwc, y_hwc, -1.0f, 1.0f);
-
-        kep::Vector4 rayEye = pI * rayClip;
-        rayEye = kep::Vector4(rayEye.x, rayEye.y, -1.0f, 0.0f);
-
-        kep::Vector3 rayWorld = kep::Matrix3(vI) * kep::Vector3(rayEye.x, rayEye.y, rayEye.z);
-
-        kep::Vector3 rayWorld3(rayWorld.x, rayWorld.y, rayWorld.z);
-        rayWorld3.normalize();
+        deway::Ray mouseRay = genMouseRay();
         
+        kep::Vector3 p2 = mouseRay.s + (mouseRay.d * 100.0f);
+//         m_testLine_ref->m_verticies.clear();
+//         m_testLine_ref->addLine(mouseRay.s, p2);
+//         m_testLine_ref->gen();
         
-        kep::Vector3 source =  m_playerCameraComp->m_transform->m_position;
-        kep::Vector3 dir =  rayWorld3;//vI*kep::Vector3(0,0,-1.0f);//rayWorld3;
+        deway::Loc mouseRayLoc = getMouseRayLoc(mouseRay);
         
-        kep::Vector3 p2 = source + (dir * 100.0f);
-        m_testLine_ref->m_verticies.clear();
-        m_testLine_ref->addLine(source, p2);
-        m_testLine_ref->gen();
+        if(mouseRayLoc.tri != NULL)
+        {
+            m_triGen_ref->m_verticies.clear();
+            m_triGen_ref->addTri(mouseRayLoc.tri->vertex[0]->pos, mouseRayLoc.tri->vertex[1]->pos, mouseRayLoc.tri->vertex[2]->pos);
+            m_triGen_ref->gen();
+            
+            std::vector<kep::Vector3> path;
+            m_agent_ref->genPath(&mouseRayLoc, &path);
+            
+            ////////////////////////
+            if(path.size() > 1)
+            {
+                m_testLine_ref->m_verticies.clear();
+                for(uint i = 0; i < path.size()-1; i++)
+                {
+                    m_testLine_ref->addLine(path[i], path[i+1]);
+                }
+                m_testLine_ref->gen();
+            }
+        }
+        else
+        {
+            printf("Selected location is invalid\n");
+        }
+        
+
+        
     }
 
 
@@ -134,3 +146,51 @@ void Empty::update()
 void Empty::render()
 {
 }
+
+deway::Ray Empty::genMouseRay()
+{
+    //GEN RAY
+    float x_hwc = (Input::Mouse::x * 2.0f)/Config::s_windowWidth -1.0f;
+    float y_hwc = 1.0f - (2.0f * Input::Mouse::y) / Config::s_windowHeight;
+
+
+    kep::Matrix4 vI;
+    vI.setOrientationAndPos(m_playerCameraComp->m_transform->m_orientation, kep::Vector3());
+    kep::Matrix4 pI = m_playerCameraComp->m_projectionMat.inverse();
+
+    kep::Vector4 rayClip(x_hwc, y_hwc, -1.0f, 1.0f);
+
+    kep::Vector4 rayEye = pI * rayClip;
+    rayEye = kep::Vector4(rayEye.x, rayEye.y, -1.0f, 0.0f);
+
+    kep::Vector3 rayWorld = kep::Matrix3(vI) * kep::Vector3(rayEye.x, rayEye.y, rayEye.z);
+
+    kep::Vector3 rayWorld3(rayWorld.x, rayWorld.y, rayWorld.z);
+    rayWorld3.normalize();
+    
+    return deway::Ray(m_playerCameraComp->m_transform->m_position, rayWorld3);
+}
+
+deway::Loc Empty::getMouseRayLoc(deway::Ray _mouseRay)
+{
+    deway::Loc loc(NULL);
+    
+    kep::Vector3 p(0.0f ,0.0f, 0.0f);
+    
+    deway::TriangleO * t = NULL;
+    
+    for(uint i = 0; i<m_agent_ref->m_pathFinder->m_navMeshSort.size(); i++)
+        if(deway::PathFinder::rayTriangleMT97(&_mouseRay, m_agent_ref->m_pathFinder->m_navMeshSort[i], &p) == 1)
+        {
+            t = m_agent_ref->m_pathFinder->m_navMeshSort[i];
+            break;
+        }
+        
+    if(t != NULL)
+    {
+        loc.tri = t;
+        loc.pos = kep::Vector3(p.x, p.y+1.0f, p.z);// shift y pos up by 1
+    }
+    return loc;
+}
+
