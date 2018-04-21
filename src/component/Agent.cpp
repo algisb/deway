@@ -53,6 +53,17 @@ bool Agent::findVertex(deway::Vertex* _vertToFind, std::vector<deway::Vertex *>*
     return false;
 }
 
+void Agent::clearGraph()
+{
+    for(uint i = 0; i < m_pathFinder->m_verts_ref->size(); i++)
+    {
+        (*m_pathFinder->m_verts_ref)[i]->G_cost = 0.0f;
+        (*m_pathFinder->m_verts_ref)[i]->H_cost = 0.0f;
+        (*m_pathFinder->m_verts_ref)[i]->F_cost = 0.0f;
+        (*m_pathFinder->m_verts_ref)[i]->parent = NULL;
+    }
+}
+
 
 int Agent::genPath(deway::Loc * _finish, std::vector<kep::Vector3> * o_path)
 {
@@ -68,6 +79,7 @@ int Agent::genPath(deway::Loc * _finish, std::vector<kep::Vector3> * o_path)
     }
     else//Run A*
     {
+        clearGraph();
         std::vector<deway::Vertex*> openList;
         std::vector<deway::Vertex*> closedList;
         
@@ -117,6 +129,8 @@ int Agent::genPath(deway::Loc * _finish, std::vector<kep::Vector3> * o_path)
                 {
                     //trace the path
                     tracePath(currentVert, o_path);
+                    o_path->insert(o_path->begin(), start.pos);
+                    o_path->push_back(_finish->pos);
                     //TODO:Add the detailed positions to the path
                     //printf("got path %d \n", o_path->size());
                     return 0;
@@ -148,15 +162,13 @@ int Agent::genPath(deway::Loc * _finish, std::vector<kep::Vector3> * o_path)
                 
             
             
-            
-            
-            
         }
     }//////////////////////////////////////////////////////////////
     
-    printf("Cant find a valid path\n");
+    printf("Unable to find a valid path\n");
     return 1;
 }
+
 
 
 

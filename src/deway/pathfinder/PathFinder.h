@@ -8,13 +8,15 @@ namespace deway
     class Loc;
     class Ray;
     class TriangleO;
+    class Vertex;
     class PathFinder 
     {
     public:
+        std::vector<Vertex*> * m_verts_ref;
         std::vector<TriangleO*> * m_navMesh_ref;
         std::vector<TriangleO*> m_navMeshSort; //Nav mesh triangle list sorted by Y height in decending order
         
-        PathFinder(std::vector<TriangleO*> * _navMesh);
+        PathFinder(std::vector<TriangleO*> * _navMesh, std::vector<Vertex*> * _verts);
         ~PathFinder();
         void genNeigbours();
         void genNormals();

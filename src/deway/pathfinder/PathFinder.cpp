@@ -5,9 +5,10 @@
 #include "Loc.h"
 using namespace deway;
 
-PathFinder::PathFinder(std::vector<TriangleO *> * _navMesh)
+PathFinder::PathFinder(std::vector<TriangleO *> * _navMesh, std::vector<Vertex*> * _verts)
 {
     m_navMesh_ref = _navMesh;
+    m_verts_ref = _verts;
     genNeigbours();
     sortMesh();
 }

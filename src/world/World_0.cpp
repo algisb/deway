@@ -87,7 +87,7 @@ World_0::World_0(Core * _core) : World(_core)
     
     
     //PATHFINDER
-    pathFinder = new deway::PathFinder(&nmgen->m_triGen->m_navMesh);
+    pathFinder = new deway::PathFinder(&nmgen->m_triGen->m_navMesh, &nmgen->m_contGen->m_vertex);
     
     
     
@@ -127,7 +127,7 @@ World_0::World_0(Core * _core) : World(_core)
                                         kep::Quaternion(), 
                                         kep::Vector3(1.0f, 1.0f, 1.0f)
                                         ));
-    refEntity->addComponent(new Render(m_core->m_testLine, m_core->m_shaderMinimal, NULL, RenderMode::SOLID,kep::Vector4(1.0f, 1.0f ,0.0f, 1.0f)));
+    refEntity->addComponent(new Render(m_core->m_testLine, m_core->m_shaderMinimal, NULL, RenderMode::SOLID,kep::Vector4(0.0f, 0.0f ,1.0f, 1.0f)));
     
 
     
