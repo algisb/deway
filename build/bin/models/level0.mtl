@@ -1,0 +1,67 @@
+# Blender MTL File: 'None'
+# Material Count: 6
+
+newmtl Bark_Coconut
+Ns 92.156863
+Ka 1.000000 1.000000 1.000000
+Kd 0.113921 0.072434 0.026651
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/James/Documents/Blender/Textures/Toon_Coconut_Tree.png
+map_d C:/Users/James/Documents/Blender/Textures/Toon_Coconut_Tree.png
+
+newmtl Coconut
+Ns 92.156863
+Ka 1.000000 1.000000 1.000000
+Kd 0.064010 0.031856 0.010889
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+
+newmtl Leaf_Coconut
+Ns 480.392157
+Ka 1.000000 1.000000 1.000000
+Kd 0.390622 0.640000 0.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 0.000000
+illum 2
+map_Kd C:/Users/James/Documents/Blender/Textures/Toon_Coconut_Leaf.png
+map_d C:/Users/James/Documents/Blender/Textures/Toon_Coconut_Leaf.png
+
+newmtl desert
+Ns 92.156863
+Ka 1.000000 1.000000 1.000000
+Kd 0.573054 0.353543 0.121525
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd Q/Downloads/seamless_desert_sand_texture_by_hhh316-d311qn7.jpg
+
+newmtl hnah
+Ns 92.156863
+Ka 1.000000 1.000000 1.000000
+Kd 0.169860 0.358840 0.110413
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+
+newmtl thing
+Ns 92.156863
+Ka 1.000000 1.000000 1.000000
+Kd 0.254831 0.162785 0.053130
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2

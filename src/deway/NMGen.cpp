@@ -77,24 +77,46 @@ NMGen::NMGen(float * _vertexData, float * _normalData, uint _numVertex, uint _vo
 
     
     
+    printf("----Voxelizer info----\n");
+    printf("Vox vol dimensions: %u %u %u\n", m_volX, m_volY, m_volZ);
+    printf("Num vox: %u \n", m_numVoxels);
+    printf("Num tri: %u \n", m_numTriangles);
+    
+    
+    double voxTime = 0.0;
+    EXEC_TIMER(voxTime,
     genSpans();
     genVoxelVolume();
-    
-    
     voxelize();
-    
     getSpanNeighbours();
     getVoxelNeighbours();
-    
     getTraversableVoxels();//fills m_travVoxels
-    getEdgeVoxels();//fills m_edgeVoxels
+    );
+    printf("Vox time: %f\n", voxTime);
     
+    double regGenTime = 0.0;
+    EXEC_TIMER(regGenTime,
+    getEdgeVoxels();//fills m_edgeVoxels
     calcEdgeDistances();
     genRegions();
+    );
+    printf("Reg gen time: %f\n", regGenTime);
+    
+    double contGenTime = 0.0;
+    EXEC_TIMER(contGenTime,
     genContours();
+    );
+    printf("Cont gen time: %f\n", contGenTime);
+    
+    double triGenTime = 0.0;
+    EXEC_TIMER(triGenTime,
     genPolygons();
+    );
+    printf("Tri gen time: %f\n", triGenTime);
     
+    double totalGenTime = voxTime + regGenTime + contGenTime + triGenTime;
     
+    printf("TOTAL GEN time: %f\n", totalGenTime);
 }
 NMGen::~NMGen()
 {
@@ -257,20 +279,20 @@ void NMGen::getTraversableVoxels()
 
 void NMGen::voxelize()
 {
-    double singleExecTime = 0.0;
-    EXEC_TIMER(singleExecTime,
-    m_voxels[0].aabb->triTest(&m_triangles[0]);
-    );
-    printf("----Voxelizer info----\n");
-    printf("Vox vol dimensions: %u %u %u\n", m_volX, m_volY, m_volZ);
-    printf("Num vox: %u \n", m_numVoxels);
-    printf("Num tri: %u \n", m_numTriangles);
-    printf("Num test: %u \n", m_numVoxels*m_numTriangles);
-    printf("vox-tri time: %f \n", singleExecTime);
-    printf("Est worst-case vox time: %f \n", singleExecTime * m_numVoxels * m_numTriangles);
-    
-    double execTime = 0.0;
-    EXEC_TIMER(execTime,
+//     double singleExecTime = 0.0;
+//     EXEC_TIMER(singleExecTime,
+//     m_voxels[0].aabb->triTest(&m_triangles[0]);
+//     );
+//     printf("----Voxelizer info----\n");
+//     printf("Vox vol dimensions: %u %u %u\n", m_volX, m_volY, m_volZ);
+//     printf("Num vox: %u \n", m_numVoxels);
+//     printf("Num tri: %u \n", m_numTriangles);
+//     printf("Num test: %u \n", m_numVoxels*m_numTriangles);
+//     printf("vox-tri time: %f \n", singleExecTime);
+//     printf("Est worst-case vox time: %f \n", singleExecTime * m_numVoxels * m_numTriangles);
+//     
+//     double execTime = 0.0;
+//     EXEC_TIMER(execTime,
     
     for(uint i = 0; i<m_numSpans; i++)
     {
@@ -288,10 +310,6 @@ void NMGen::voxelize()
                             m_spans[i].m_voxels[k]->traversable = true;
                             m_numTravVoxels++;
                         }
-//                         else
-//                         {
-//                             m_spans[i].m_voxels[k]->blacklisted = true;
-//                         }
                     }
                 }
             }
@@ -299,8 +317,7 @@ void NMGen::voxelize()
     }
     
     
-    );
-    printf("Vox time: %f\n", execTime);
+//     );
     heightTests();
 }
 
@@ -461,7 +478,6 @@ void NMGen::calcEdgeDistances()
 void NMGen::genRegions()
 {
     m_regGen = new RegGen(m_travVoxels, m_numTravVoxels, m_maxEdgeDist);
-    printf("m_maxEdgeDist: %f \n", m_maxEdgeDist);
 }
 
 void NMGen::genContours()
@@ -470,6 +486,7 @@ void NMGen::genContours()
 }
 void NMGen::genPolygons()
 {
+
     m_triGen = new TriGen(&m_contGen->m_contours);
 }
 

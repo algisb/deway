@@ -112,7 +112,7 @@ void TriGen::earClip()
                     kep::Vector2 next(pv[2]->pos.x, pv[2]->pos.z);
                     float pdist =  (next - prev).magnitude(); //(pv[2]->pos - pv[0]->pos).magnitude();
                     
-                    if (!((curr.x - prev.x) * (next.y - curr.y) - (next.x - curr.x) * (curr.y - prev.y) > 0)) //use the determinant to check if the hull is convex
+                    if (((curr.x - prev.x) * (next.y - curr.y) - (next.x - curr.x) * (curr.y - prev.y) < 0)) //use the determinant to check if the hull is convex
                         if(pdist < dist || (v[0] == NULL)) //create triangles out of partition with smalles segment
                         {
                             v[0] = pv[0];

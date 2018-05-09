@@ -190,7 +190,7 @@ World_0::World_0(Core * _core) : World(_core)
 //         int r2 = rand() % 100;
 //         //printf("rand n: %f \n", (float)r/100.0f);
 //         
-//         kep::Vector3 col = kep::Vector3((float)r0/100.0f, (float)r1/100.0f, (float)r2/100.0f);
+//         kep::Vector4 col = kep::Vector4((float)r0/100.0f, (float)r1/100.0f, (float)r2/100.0f, 1.0f);
 //         for(uint i = 0; i<nmgen->m_regGen->m_regions[regID]->m_voxels.size(); i++)
 //         {
 //             
@@ -223,20 +223,20 @@ World_0::World_0(Core * _core) : World(_core)
 //             for(uint l = 0; l<4; l++)
 //             {
 //                 //(*nmgen->m_contGen->m_regions_ref)[j]->m_voxels[k]->edg[l];
-//                 if((*nmgen->m_contGen->m_regions_ref)[j]->m_voxels[k]->edg[l]->external)
-//                 {
+//                 //if((*nmgen->m_contGen->m_regions_ref)[j]->m_voxels[k]->edg[l]->external)
+//                 //{
 //                     //tmpVox.push_back((*nmgen->m_contGen->m_regions_ref)[j]->m_voxels[k]);
 //                     //for(uint x = 0; x<4; x++)
 //                         m_core->m_contour->addLine( (*nmgen->m_contGen->m_regions_ref)[j]->m_voxels[k]->edg[l]->vertex[0]->pos /*+ kep::Vector3(asd,asd,asd)*/, (*nmgen->m_contGen->m_regions_ref)[j]->m_voxels[k]->edg[l]->vertex[1]->pos/*+ kep::Vector3(asd,asd,asd)*/);
 //                     //break;
-//                 }
+//                 //}
 //             }
 //             asd = asd + 0.1f;
 //         }
 // 
 //     }
-    
-    
+//     
+//     
 //     m_core->m_contour->gen();
 //     
 //     
@@ -277,12 +277,6 @@ World_0::World_0(Core * _core) : World(_core)
     for(uint i = 0; i< nmgen->m_triGen->m_navMesh.size(); i++)
     {
         m_core->m_navMesh->addTri(nmgen->m_triGen->m_navMesh[i]->vertex[0]->pos, nmgen->m_triGen->m_navMesh[i]->vertex[1]->pos, nmgen->m_triGen->m_navMesh[i]->vertex[2]->pos);
-        
-        //render neighbours
-//         for(uint j = 0; j<3; j++)
-//            if(nmgen->m_triGen->m_navMesh[i]->nghbr[j] != NULL) 
-//                m_core->m_navMesh->addTri(nmgen->m_triGen->m_navMesh[i]->nghbr[j]->vertex[0]->pos, nmgen->m_triGen->m_navMesh[i]->nghbr[j]->vertex[1]->pos, nmgen->m_triGen->m_navMesh[i]->nghbr[j]->vertex[2]->pos);
-        
     }
     m_core->m_navMesh->gen();
     
@@ -324,19 +318,21 @@ World_0::World_0(Core * _core) : World(_core)
 //                                         kep::Vector3(1.0f, 1.0f, 1.0f)
 //                                         ));
 //     refEntity->addComponent(new Render(m_core->m_contour, m_core->m_shaderMinimal, NULL, RenderMode::WIRE));
-    
+//     
     //EXTERNAL EDGE VISUALS
 //     for(uint regID = 0; regID<nmgen->m_regGen->m_regions.size(); regID++)
 //     {
-//         kep::Vector3 col = kep::Vector3(1, 0, 0);
 //         for(uint i = 0; i<nmgen->m_regGen->m_regions[regID]->m_voxels.size(); i++)
 //         {
-//             bool isExt = false;
-//             for(uint j = 0; j<4; j++)
-//                 if(nmgen->m_regGen->m_regions[regID]->m_voxels[i]->edg[j]->external)
-//                 {
-//                     m_core->m_contour->addLine(nmgen->m_regGen->m_regions[regID]->m_voxels[i]->edg[j]->v[0], nmgen->m_regGen->m_regions[regID]->m_voxels[i]->edg[j]->v[1]);
-//                 }
+//             if(nmgen->m_regGen->m_regions[regID]->m_voxels[i]->edge)
+//                 m_core->m_contour->addBox(nmgen->m_regGen->m_regions[regID]->m_voxels[i]->aabb->c,nmgen->m_regGen->m_regions[regID]->m_voxels[i]->aabb->hs);
+//             
+// //             for(uint j = 0; j<4; j++)
+// //                 //if(nmgen->m_regGen->m_regions[regID]->m_voxels[i]->edg[j]->external)
+// //             {
+// //                 
+// //                 m_core->m_contour->addLine(nmgen->m_regGen->m_regions[regID]->m_voxels[i]->edg[j]->vertex[0]->pos, nmgen->m_regGen->m_regions[regID]->m_voxels[i]->edg[j]->vertex[1]->pos);
+// //             }
 //         }
 //     }
 //     m_core->m_contour->gen();
@@ -363,7 +359,7 @@ World_0::World_0(Core * _core) : World(_core)
 //                                             ));
 //         float shade = nmgen->m_travVoxels[i]->dist/nmgen->m_maxEdgeDist;
 //         
-//         refEntity->addComponent(new Render(m_core->m_plane, m_core->m_shaderMinimal ,NULL, RenderMode::SOLID, kep::Vector3(shade, shade, shade)));
+//         refEntity->addComponent(new Render(m_core->m_plane, m_core->m_shaderMinimal ,NULL, RenderMode::SOLID, kep::Vector4(shade, shade, shade, 1.0f)));
 //     }
     
     
@@ -383,11 +379,11 @@ World_0::World_0(Core * _core) : World(_core)
 //         m_core->m_voxelVolumeMesh->addBox(nmgen->m_voxels[i].aabb.c, nmgen->m_voxels[i].aabb.hs);
 //     }
     
-//     for(int i = 0; i<nmgen->m_spans[0].m_size; i++)
+//     for(int i = 0; i<nmgen->m_spans[20000].m_size; i++)
 //     {
-//         m_core->m_voxelVolumeMesh->addBox(nmgen->m_spans[0].m_voxels[i]->aabb.c, nmgen->m_spans[0].m_voxels[i]->aabb.hs);
+//         m_core->m_voxelVolumeMesh->addBox(nmgen->m_spans[20000].m_voxels[i]->aabb->c, nmgen->m_spans[20000].m_voxels[i]->aabb->hs);
 //     }
-    
+//     
 //     m_core->m_voxelVolumeMesh->gen();
 //     
 //     refEntity = new Entity(this, "voxel volume");
@@ -403,8 +399,8 @@ World_0::World_0(Core * _core) : World(_core)
     //////////////////////CAM/////////////////////////
     empty[1] = new Entity(this, "player camera");
     empty[1]->addComponent(new Transform(
-                                    kep::Vector3(0.0f, 10.0f, 0.0f),
-                                    kep::Quaternion(), 
+                                    kep::Vector3(-50.0f, 70.0f, 50.0f),
+                                    kep::Quaternion(kep::Vector3(1,0,0), 45.0f) * kep::Quaternion(kep::Vector3(0,1,0), 45.0f), 
                                     kep::Vector3(1.0f, 1.0f, 1.0f)
                                     ));
     

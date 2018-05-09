@@ -45,7 +45,6 @@ namespace deway
         ContGen * m_contGen; //contour generator
         TriGen * m_triGen; //polygon generator
         
-        
         NMGen(float * _vertexData, float * _normalData, uint _numVertex, uint _volX, uint _volY, uint _volZ, kep::Vector3 _offset, bool _autoSizeVolume, float _voxelSize,float _maxSlope, float _agentHeight, float _maxStepHeight);
         ~NMGen();
         

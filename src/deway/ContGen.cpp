@@ -537,7 +537,6 @@ void ContGen::extractContourVertex()
 
 void ContGen::genSegments()//Prepares the contours for verticies for reduction algorithm
 {
-    
     for(uint i = 0; i<m_contours.size(); i++)
     {
         ////////////////////////////////////////////////////////

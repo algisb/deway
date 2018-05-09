@@ -5,10 +5,10 @@ set (CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "./bin")
 SET( CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "./bin")
 SET( CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "./bin")
-add_definitions(-D_GLIBCXX_CONCEPT_CHECKS)#debug define
-add_definitions(-D_GLIBCXX_DEBUG)#debug define
-add_definitions(-D_GLIBCXX_DEBUG_PEDANTIC)#debug define
-set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+#add_definitions(-D_GLIBCXX_CONCEPT_CHECKS)#debug define
+#add_definitions(-D_GLIBCXX_DEBUG)#debug define
+#add_definitions(-D_GLIBCXX_DEBUG_PEDANTIC)#debug define
+#set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 #glew------------------------------------------------------
