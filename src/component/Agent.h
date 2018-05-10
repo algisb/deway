@@ -6,7 +6,7 @@
 #include "Config.h"
 #include "Transform.h"
 #include "KePhys.h"
-
+#include "../deway/typedefs.h"
 namespace deway
 {
     class PathFinder;
@@ -25,7 +25,7 @@ namespace kelp
         
         
         std::vector<kep::Vector3> m_path;
-        uint m_pathProgress;
+        deway::uint m_pathProgress;
         
         
         Agent(deway::PathFinder * _pathFinder);

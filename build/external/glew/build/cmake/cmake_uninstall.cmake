@@ -1,19 +1,19 @@
-if(NOT EXISTS "/root/projects/deway/build/external/glew/build/cmake/install_manifest.txt")
-  message(FATAL_ERROR "Cannot find install manifest: /root/projects/deway/build/external/glew/build/cmake/install_manifest.txt")
-endif(NOT EXISTS "/root/projects/deway/build/external/glew/build/cmake/install_manifest.txt")
+if(NOT EXISTS "C:/Users/Algirdas/Downloads/New folder/deway/build/external/glew/build/cmake/install_manifest.txt")
+  message(FATAL_ERROR "Cannot find install manifest: C:/Users/Algirdas/Downloads/New folder/deway/build/external/glew/build/cmake/install_manifest.txt")
+endif(NOT EXISTS "C:/Users/Algirdas/Downloads/New folder/deway/build/external/glew/build/cmake/install_manifest.txt")
 
 if (NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set (CMAKE_INSTALL_PREFIX "/usr/local")
+  set (CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/deway")
 endif ()
  message(${CMAKE_INSTALL_PREFIX})
 
-file(READ "/root/projects/deway/build/external/glew/build/cmake/install_manifest.txt" files)
+file(READ "C:/Users/Algirdas/Downloads/New folder/deway/build/external/glew/build/cmake/install_manifest.txt" files)
 string(REGEX REPLACE "\n" ";" files "${files}")
 foreach(file ${files})
   message(STATUS "Uninstalling $ENV{DESTDIR}${file}")
   if(IS_SYMLINK "$ENV{DESTDIR}${file}" OR EXISTS "$ENV{DESTDIR}${file}")
     exec_program(
-      "/usr/bin/cmake" ARGS "-E remove \"$ENV{DESTDIR}${file}\""
+      "C:/Program Files/CMake/bin/cmake.exe" ARGS "-E remove \"$ENV{DESTDIR}${file}\""
       OUTPUT_VARIABLE rm_out
       RETURN_VALUE rm_retval
       )

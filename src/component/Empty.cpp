@@ -12,6 +12,7 @@
 #include "deway/TriangleO.h"
 
 using namespace kelp;
+using namespace deway;
 Empty::Empty(Entity * _playerCamera, KePhys * _agentBody, Agent * _agent, MeshGen * _trigen, MeshGenLine * _testLine)
 {
     kekX = -8.0f;

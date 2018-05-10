@@ -4,7 +4,7 @@
 #include "deway/pathfinder/Loc.h"
 #include "deway/TriangleO.h"
 using namespace kelp;
-
+using namespace deway;
 Agent::Agent(deway::PathFinder * _pathFinder) : Component()
 {
     m_pathFinder = _pathFinder;
