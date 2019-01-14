@@ -21,7 +21,7 @@
 #include "deway/TriangleO.h"
 #include "deway/pathfinder/PathFinder.h"
 #include "component/Agent.h"
-#include "deway\typedefs.h"
+#include "deway/typedefs.h"
 using namespace kelp;
 using namespace deway;
 World_0::World_0(Core * _core) : World(_core)
